@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My experiment</title>
+        <script src="jspsych-6.0.4/jspsych.js"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
+        <script src="stimuli.js"></script>
+        <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+    </head>
+    <body></body>
+    <script>
+    	
+    	while (true) {
+    		var uid = window.prompt('uid:', '')
+    		if (uid in uids) { break; }
+		}
+
+    	var uid = window.prompt()
+
+    	var pause = false
+    	var abort = false
+
+    	var keys = {
+    		set: '8numpad',
+    		noset: '2numpad',
+    		explain: '6numpad',
+    		noexplain: '4numpad',
+    		next: '5numpad',
+    		pause: 'p',
+    		abort: 'a'
+    	}
+
+  //   	var fullscreen_on = {
+		// 	type: 'fullscreen',
+		// 	fullscreen_mode: true
+		// }
+
+		// var fullscreen_off = {
+		// 	type: 'fullscreen',
+		// 	fullscreen_mode: false
+		// }
+
+		var instructions = {
+			type: 'instructions',
+			pages: ['page 1',
+					'page 2',
+					'page 3',
+					'Fin de las instrucciones. Siguiente para comenzar. Anterior para regresar.'],
+			allow_keys: true,  // todo: bug: previous button is not ungreyed when page 2 is displayed
+			allow_backward: true,
+			show_clickable_nav: true,
+			button_label_previous: 'Anterior',  // todo: can't an image be used instead?
+			button_label_next: 'Siguiente'
+		}
+
+		var stimuli = {
+			type: 'html-keyboard-response',
+			stimulus: jsPsych.timelineVariable('cards'),
+			choices: [keys.set, keys.noset, keys.pause, keys.abort],  // todo: the problem is that if pause or abort keys are pressed, this part is over
+			data: { trial_part: 'stimuli', set: jsPsych.timelineVariable('set') },
+			on_finish: function(data) {
+				if(data.set) {
+					var correct_key = keys.set
+				} else {
+					var correct_key = keys.noset
+				}
+				data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(correct_key);
+			}
+		}
+
+		var explanation = {
+			type: 'html-keyboard-response',
+			stimulus: 'explanation yes or no?',
+			choices: [keys.explain, keys.noexplain, keys.pause, keys.abort],
+			data: { trial_part: 'decision' },
+			on_finish: function(data) {
+				data.explain = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keys.explain)
+			}
+		}
+
+		var feedback = {
+			type: 'html-keyboard-response',
+			stimulus: function() {
+				var correct = jsPsych.data.get().filter({trial_part: 'stimuli'}).last(1).values()[0].correct
+				var explain = jsPsych.data.get().filter({trial_part: 'decision'}).last(1).values()[0].explain
+				var stimulus = ''
+				if(explain) {
+		            stimulus = stimulus + jsPsych.timelineVariable('explanation', true) + '\n'
+		        } else {
+		        	stimulus = stimulus + 'no explanation' + '\n'
+		        }
+		        if(correct) {
+		        	stimulus = stimulus + 'correct!'
+		        } else {
+		        	stimulus = stimulus + 'wrong!'
+		        }
+		        return stimulus
+		    },
+			choices: [keys.next],
+			data: { trial_part: 'feedback' }
+		}
+
+		var test = {
+			timeline: [stimuli, explanation, feedback],
+			timeline_variables: [  // todo: there should be a number which identifies each trial, consider internal_node_id
+				{cards: 'cards 1', explanation: 'expl. 1', set: 0},
+				{cards: 'cards 2', explanation: 'expl. 2', set: 1}
+			],
+			// conditional_function: !abort  // todo: this should be checked before each trial part
+
+		}
+
+		var timeline = [test]
+		
+		jsPsych.init({
+		    timeline: timeline,
+		    on_trial_finish: function(data) {
+		    	var trial_num = data.internal_node_id.split('-').slice(-1)[0].split('.')[1]
+		    	data.trial_num = trial_num
+		    },
+		    on_finish: function(){jsPsych.data.displayData(); }
+		});
+
+    </script>
+</html>
