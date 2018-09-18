@@ -46,7 +46,7 @@ var makeHTML = function({cards_img, cards_bg="#AAA", response="", explain_img=""
             </tr>
             <tr style="height:50vh;background:#AAA">
                 <td>
-                    <img src="${explain_img}" />
+                    <img src="${explain_img}" style="width:${20/11*.4*100}%"/>
                 </td>
             </tr>
         </table>
