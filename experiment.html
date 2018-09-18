@@ -5,18 +5,30 @@
         <script src="jspsych-6.0.4/jspsych.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
-        <script src="stimuli.js"></script>
+        <script type="text/javascript" src="stimuli.json"></script>
+        <script src="auxiliary.js"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+        <link href="experiment.css" rel="stylesheet" type="text/css"></link>
     </head>
     <body></body>
     <script>
-    	
-    	while (true) {
-    		var uid = window.prompt('uid:', '')
-    		if (uid in uids) { break; }
-		}
 
-    	var uid = window.prompt()
+    	// todo: preload!
+
+  //   	while (true) {
+  //   		var uid = window.prompt('uid:', '')
+  //   		if (stimuli[uid]) { break; }
+		// }
+
+		// while (true) {
+		// 	var mode = window.prompt('test/retest:', '')
+		// 	if (mode in stimuli[uid]) { break; }
+		// }
+
+		// var trials = stimuli[uid].mode
+
+		var trials = stimuli[1].test
+		var score = 0
 
     	var pause = false
     	var abort = false
@@ -24,8 +36,8 @@
     	var keys = {
     		set: '8numpad',
     		noset: '2numpad',
-    		explain: '6numpad',
-    		noexplain: '4numpad',
+    		explain: '4numpad',
+    		noexplain: '6numpad',
     		next: '5numpad',
     		pause: 'p',
     		abort: 'a'
@@ -54,11 +66,13 @@
 			button_label_next: 'Siguiente'
 		}
 
-		var stimuli = {
+		var cards = {
 			type: 'html-keyboard-response',
-			stimulus: jsPsych.timelineVariable('cards'),
+			stimulus: function() {
+				return makeHTML({cards_img: jsPsych.timelineVariable('cards_img', true), score:score, max_score:trials.length})
+			},
 			choices: [keys.set, keys.noset, keys.pause, keys.abort],  // todo: the problem is that if pause or abort keys are pressed, this part is over
-			data: { trial_part: 'stimuli', set: jsPsych.timelineVariable('set') },
+			data: { trial_part: 'cards', set: jsPsych.timelineVariable('set') },
 			on_finish: function(data) {
 				if(data.set) {
 					var correct_key = keys.set
@@ -66,47 +80,41 @@
 					var correct_key = keys.noset
 				}
 				data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(correct_key);
+				data.response = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keys.set) ? 'set' : 'noset'
 			}
 		}
 
 		var explanation = {
 			type: 'html-keyboard-response',
-			stimulus: 'explanation yes or no?',
+			stimulus: function() {
+				var response = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].response				
+				return makeHTML({cards_img: jsPsych.timelineVariable('cards_img', true), response: response, explain_img: 'images/explain.png',
+					score: score, max_score: trials.length})
+			},
 			choices: [keys.explain, keys.noexplain, keys.pause, keys.abort],
 			data: { trial_part: 'decision' },
 			on_finish: function(data) {
 				data.explain = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keys.explain)
+				score = jsPsych.data.get().select('correct').sum()
 			}
 		}
 
 		var feedback = {
 			type: 'html-keyboard-response',
 			stimulus: function() {
-				var correct = jsPsych.data.get().filter({trial_part: 'stimuli'}).last(1).values()[0].correct
+				var correct = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].correct
 				var explain = jsPsych.data.get().filter({trial_part: 'decision'}).last(1).values()[0].explain
-				var stimulus = ''
-				if(explain) {
-		            stimulus = stimulus + jsPsych.timelineVariable('explanation', true) + '\n'
-		        } else {
-		        	stimulus = stimulus + 'no explanation' + '\n'
-		        }
-		        if(correct) {
-		        	stimulus = stimulus + 'correct!'
-		        } else {
-		        	stimulus = stimulus + 'wrong!'
-		        }
-		        return stimulus
+				var response = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].response				
+				return makeHTML({cards_img: jsPsych.timelineVariable('cards_img', true), response: response, cards_bg: correct ? 'lawngreen' : 'red',
+					explain_img: explain ? jsPsych.timelineVariable('explain_img', true) : '', score: score, max_score: trials.length})
 		    },
 			choices: [keys.next],
-			data: { trial_part: 'feedback' }
+			data: { trial_part: 'feedback' },
 		}
 
 		var test = {
-			timeline: [stimuli, explanation, feedback],
-			timeline_variables: [  // todo: there should be a number which identifies each trial, consider internal_node_id
-				{cards: 'cards 1', explanation: 'expl. 1', set: 0},
-				{cards: 'cards 2', explanation: 'expl. 2', set: 1}
-			],
+			timeline: [cards, explanation, feedback],
+			timeline_variables: trials
 			// conditional_function: !abort  // todo: this should be checked before each trial part
 
 		}
