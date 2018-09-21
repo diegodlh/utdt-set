@@ -5,6 +5,7 @@
         <script src="jspsych-6.0.4/jspsych.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script>
         <script type="text/javascript" src="stimuli.json"></script>
         <script src="auxiliary.js"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
@@ -13,22 +14,29 @@
     <body></body>
     <script>
 
+    	var uid = 1
+		var mode = 'test'
+		
     	// todo: preload!
+  //   	modes = ['test', 'retest']
 
   //   	while (true) {
   //   		var uid = window.prompt('uid:', '')
-  //   		if (stimuli[uid]) { break; }
+  //   		if (stimuli[uid-1]) { break; }
 		// }
 
 		// while (true) {
-		// 	var mode = window.prompt('test/retest:', '')
-		// 	if (mode in stimuli[uid]) { break; }
+		// 	var mode = modes[window.prompt('1 (test) / 2 (retest):', '') - 1]
+		// 	if (mode in stimuli[uid-1]) { break; }
 		// }
 
-		// var trials = stimuli[uid].mode
+		var trials = stimuli[uid-1][mode]
 
-		var trials = stimuli[1].test
 		var score = 0
+		var trial_num = 1
+
+		var audio_correct = new Audio('sounds/correct.wav')
+		var audio_wrong = new Audio('sounds/wrong.wav')
 
     	var pause = false
     	var abort = false
@@ -43,15 +51,29 @@
     		abort: 'a'
     	}
 
-  //   	var fullscreen_on = {
-		// 	type: 'fullscreen',
-		// 	fullscreen_mode: true
-		// }
+    	var fullscreen_on = {
+			type: 'fullscreen',
+			fullscreen_mode: true,
+			data: {},
+			delay_after: 0
+		}
 
-		// var fullscreen_off = {
-		// 	type: 'fullscreen',
-		// 	fullscreen_mode: false
-		// }
+		var fullscreen_off = {
+			type: 'fullscreen',
+			fullscreen_mode: false,
+			data: {}
+		}
+
+		var hold = {
+			type: 'html-keyboard-response',
+			stimulus: `
+				<p style="background-color:#AAA;height:100vh;width:100vw;font-size:75vh;margin:0;display:table-cell;vertical-align:middle">
+					${uid.toString().padStart(3, '0')}
+				</p>
+				`,
+			choices: ['enter'],
+			data: {}
+		}
 
 		var instructions = {
 			type: 'instructions',
@@ -69,11 +91,12 @@
 		var cards = {
 			type: 'html-keyboard-response',
 			stimulus: function() {
-				return makeHTML({cards_img: jsPsych.timelineVariable('cards_img', true), score:score, max_score:trials.length})
+				return makeHTML({cards: jsPsych.timelineVariable('cards', true), score:score, max_score:trials.length, uid:uid, trial_num:trial_num})
 			},
 			choices: [keys.set, keys.noset, keys.pause, keys.abort],  // todo: the problem is that if pause or abort keys are pressed, this part is over
-			data: { trial_part: 'cards', set: jsPsych.timelineVariable('set') },
+			data: { trial_part: 'cards'},
 			on_finish: function(data) {
+				data.set = jsPsych.timelineVariable('type', true) >= 0
 				if(data.set) {
 					var correct_key = keys.set
 				} else {
@@ -88,8 +111,8 @@
 			type: 'html-keyboard-response',
 			stimulus: function() {
 				var response = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].response				
-				return makeHTML({cards_img: jsPsych.timelineVariable('cards_img', true), response: response, explain_img: 'images/explain.png',
-					score: score, max_score: trials.length})
+				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, explain: 'ask',
+					score: score, max_score: trials.length, uid:uid, trial_num:trial_num})
 			},
 			choices: [keys.explain, keys.noexplain, keys.pause, keys.abort],
 			data: { trial_part: 'decision' },
@@ -104,12 +127,15 @@
 			stimulus: function() {
 				var correct = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].correct
 				var explain = jsPsych.data.get().filter({trial_part: 'decision'}).last(1).values()[0].explain
-				var response = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].response				
-				return makeHTML({cards_img: jsPsych.timelineVariable('cards_img', true), response: response, cards_bg: correct ? 'lawngreen' : 'red',
-					explain_img: explain ? jsPsych.timelineVariable('explain_img', true) : '', score: score, max_score: trials.length})
+				var response = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].response
+				var type = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].set ? 'set' : 'noset'
+				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, cards_bg: correct ? 'lawngreen' : 'red',
+					explain: explain ? type : 'no', score: score, max_score: trials.length, uid:uid, trial_num:trial_num, next:true})
 		    },
 			choices: [keys.next],
 			data: { trial_part: 'feedback' },
+			on_load: function() {jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].correct ? audio_correct.play() : audio_wrong.play()},
+			on_finish: function() {trial_num += 1}
 		}
 
 		var test = {
@@ -120,13 +146,25 @@
 		}
 
 		var timeline = [test]
+
+		// var preload_images = ['images/coin.svg', 'images/explain.png', 'images/noset.png', 'images/set.png']
+		// for (i = 0; i < trials.length; i++) {
+		// 	preload_images.push(trials[i].cards_img)
+		// 	preload_images.push(trials[i].explain_img)
+		// }    
 		
 		jsPsych.init({
 		    timeline: timeline,
-		    on_trial_finish: function(data) {
-		    	var trial_num = data.internal_node_id.split('-').slice(-1)[0].split('.')[1]
-		    	data.trial_num = trial_num
+		    on_trial_start: function(trial) {
+		    	trial.data.ts_start = Date.now()
 		    },
+		    on_trial_finish: function(data) {
+		    	// var trial_num = data.internal_node_id.split('-').slice(-1)[0].split('.')[1]
+		    	data.trial_num = trial_num,
+		    	data.ts_end = Date.now()
+		    },
+		    // preload_images: preload_images,
+		    // preload_audio: ['sounds/correct.wav', 'sounds/wrong.wav'],
 		    on_finish: function(){jsPsych.data.displayData(); }
 		});
 
