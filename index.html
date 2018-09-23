@@ -2,18 +2,18 @@
 <html>
     <head>
     	<meta charset="utf-8"/>
-        <title>My experiment</title>
+        <title>Pequeños Maestros: Set!</title>
         <script src="jspsych-6.0.4/jspsych.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script>
+        <!-- <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script> -->
         <script type="text/javascript" src="stimuli.json"></script>
         <script src="auxiliary.js"></script>
         <script src="preload_images.js"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
-        <link href="experiment.css" rel="stylesheet" type="text/css"></link>
+        <!-- <link href="experiment.css" rel="stylesheet" type="text/css"></link> -->
     </head>
-    <body><dialog open>This is an open dialog window</dialog></body>
+    <body></body>
     <script>
 
 		// var outerWidth_max = window.outerWidth
@@ -68,12 +68,32 @@
 			// 		break
 			// 	}
 			// }
+			saveData(false)
 			var clave = window.alert()
 			// Cancel the event as stated by the standard.
 			event.preventDefault();
 			// Chrome requires returnValue to be set.
 			event.returnValue = '';
 		}
+
+		var saveData = function(async) {
+			var basename = uid.toString().padStart(3, '0') + mode + jsPsych.startTime().toISOString()
+			sendData('data_' + basename, jsPsych.data.get().ignore('stimulus').csv())
+			sendData('intdata_' + basename, jsPsych.data.getInteractionData().csv())
+		}
+
+		var keydown = function(keychar) {
+			if (true) {
+				var e = new Event("keydown")
+				e.keyCode=jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychar)
+				document.body.dispatchEvent(e)
+				var e = new Event("keyup")
+				e.keyCode=jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychar)
+				document.body.dispatchEvent(e)
+			}
+		}
+
+		document.body.addEventListener("click", function(e) {console.log(e.keyCode)})
 
     	var uid = 1
 		var mode = 'test'
@@ -94,21 +114,11 @@
 		// var trials = [trials[0]]
 
 		var score = 0
-		var trial_num = 1
+		var trial_num = 0
 
-		var audio_correct = new Audio('sounds/correct.wav')
-		var audio_wrong = new Audio('sounds/wrong.wav')
-		var audio_win = new Audio('sounds/win.wav')
-
-    	var keys = {
-    		set: '8numpad',
-    		noset: '2numpad',
-    		explain: '4numpad',
-    		noexplain: '6numpad',
-    		next: '5numpad',
-    		pause: 'p',
-    		abort: 'a'
-    	}
+		var audio_correct = new Audio('sounds/correct.mp3')
+		var audio_wrong = new Audio('sounds/wrong.mp3')
+		var audio_win = new Audio('sounds/win.mp3')
 
     	var fullscreen_on = {
 			type: 'fullscreen',
@@ -150,6 +160,7 @@
 		var cards = {
 			type: 'html-keyboard-response',
 			stimulus: function() {
+				trial_num += 1
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), score:score, max_score:trials.length, uid:uid, trial_num:trial_num})
 			},
 			choices: [keys.set, keys.noset],  // todo: the problem is that if pause or abort keys are pressed, this part is over
@@ -193,8 +204,7 @@
 		    },
 			choices: [keys.next],
 			data: { trial_part: 'feedback' },
-			on_load: function() {jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].correct ? audio_correct.play() : audio_wrong.play()},
-			on_finish: function() {trial_num += 1}
+			on_load: function() {jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].correct ? audio_correct.play() : audio_wrong.play()}
 		}
 
 		var test = {
@@ -217,13 +227,23 @@
 				return html
 				},
 			on_load: function() {
-				audio_win.play()},
+				audio_win.play()
+				saveData()
 				// window.removeEventHandler('beforeunload', )
+			},
 			choices: jsPsych.NO_KEYS,
 			data: {}
 		}
 
 		var timeline = [test, winner]
+
+		function sendData(name, data, async){
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', 'http://set.conversodromo.com.ar/write_data.php', async); // 'write_data.php' is the path to the php file described above.
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.send(JSON.stringify({filename: name, filedata: data}));
+		}
+
 
 		jsPsych.init({
 		    timeline: timeline,
@@ -240,8 +260,7 @@
     			data.ts_start = Date.now(),
     			data.trial_num = trial_num,
     			console.log(JSON.stringify(data))
-  			},
-		    on_finish: function(){jsPsych.data.displayData(); }
+  			}
 		});
 
     </script>
