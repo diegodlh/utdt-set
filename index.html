@@ -6,7 +6,7 @@
         <script src="jspsych-6.0.4/jspsych.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
-        <!-- <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script> -->
+        <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script>
         <script type="text/javascript" src="stimuli.json"></script>
         <script src="auxiliary.js"></script>
         <script src="preload_images.js"></script>
@@ -242,7 +242,7 @@
 			data: {}
 		}
 
-		var timeline = [test, winner]
+		var timeline = [fullscreen_on, test, winner]
 
 		function sendData(name, data, async){
 			var xhr = new XMLHttpRequest();
