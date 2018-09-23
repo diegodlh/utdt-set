@@ -4,7 +4,7 @@ var preload_images = [
 'images/3.png',
 'images/blue.png',
 'images/card.png',
-'images/coin.svg',
+'images/coin.png',
 'images/diamond_open_blue.png',
 'images/diamond_open_green.png',
 'images/diamond_open_red.png',
@@ -51,7 +51,7 @@ var preload_images = [
 ]
 
 var preload_instructions = [
-'instructions/fin.svg',
+'instructions/fin.png',
 'instructions/leftkey.png',
 'instructions/page1a.jpg',
 'instructions/page1b.jpg',
