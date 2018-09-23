@@ -1,0 +1,4 @@
+<Files write_data.php>
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Headers "Content-Type"
+</Files>

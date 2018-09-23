@@ -170,17 +170,17 @@
 				trial_num += 1
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), score:score, max_score:trials.length, uid:uid, trial_num:trial_num})
 			},
-			choices: [keys.set, keys.noset],  // todo: the problem is that if pause or abort keys are pressed, this part is over
+			choices: [keychars.set, keychars.noset],  // todo: the problem is that if pause or abort keys are pressed, this part is over
 			data: { trial_part: 'cards'},
 			on_finish: function(data) {
 				data.set = jsPsych.timelineVariable('type', true) >= 0
 				if(data.set) {
-					var correct_key = keys.set
+					var correct_key = keychars.set
 				} else {
-					var correct_key = keys.noset
+					var correct_key = keychars.noset
 				}
 				data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(correct_key);
-				data.response = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keys.set) ? 'set' : 'noset'
+				data.response = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychars.set) ? 'set' : 'noset'
 			}
 		}
 
@@ -191,10 +191,10 @@
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, explain: 'ask',
 					score: score, max_score: trials.length, uid:uid, trial_num:trial_num})
 			},
-			choices: [keys.explain, keys.noexplain],
+			choices: [keychars.explain, keychars.noexplain],
 			data: { trial_part: 'decision' },
 			on_finish: function(data) {
-				data.explain = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keys.explain)
+				data.explain = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychars.explain)
 				score = jsPsych.data.get().select('correct').sum()
 			}
 		}
@@ -209,7 +209,7 @@
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, cards_bg: correct ? 'lawngreen' : 'red',
 					explain: explain ? type : 'no', score: score, max_score: trials.length, uid:uid, trial_num:trial_num, next:true})
 		    },
-			choices: [keys.next],
+			choices: [keychars.next],
 			data: { trial_part: 'feedback' },
 			on_load: function() {jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].correct ? audio_correct.play() : audio_wrong.play()}
 		}

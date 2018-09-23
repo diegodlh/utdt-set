@@ -1,4 +1,4 @@
-var keys = {
+var keychars = {
     set: '8numpad',
     noset: '2numpad',
     explain: '4numpad',
@@ -19,8 +19,8 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="no", scor
     var explain_html
     if(explain=='ask') {
     	explain_html = `
-            <img src="images/help.png" onclick=keydown("${keys.explain}") style="height:25vh;margin:5vw"/>
-            <img src="images/nohelp.png" onclick=keydown("${keys.noexplain}") style="height:25vh;margin:5vw"/>`
+            <img src="images/help.png" onclick=keydown("${keychars.explain}") style="height:25vh;margin:5vw"/>
+            <img src="images/nohelp.png" onclick=keydown("${keychars.noexplain}") style="height:25vh;margin:5vw"/>`
     } else if(explain=='no') {
     	explain_html = ''
     } else if(explain=='set' || explain=='noset') {
@@ -43,8 +43,8 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="no", scor
                                 ${cardsHTML(cards)}
                             </td>
                             <td style="width:${(1-cards_width)/2*100}%">
-                                <img src="images/set.png" onclick=keydown("${keys.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/><br>
-                                <img src="images/noset.png" onclick=keydown("${keys.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
+                                <img src="images/set.png" onclick=keydown("${keychars.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/><br>
+                                <img src="images/noset.png" onclick=keydown("${keychars.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
                             </td>
                         </tr>
                     </table>
@@ -57,7 +57,7 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="no", scor
             	</td>
             </tr>
         </table>
-        ${next ? `<img src="images/next.png" onclick=keydown("${keys.next}") style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:10%" />` : ''}
+        ${next ? `<img src="images/next.png" onclick=keydown("${keychars.next}") style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:10%" />` : ''}
     </div>
         `;
     return html
