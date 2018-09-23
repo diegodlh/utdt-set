@@ -49,3 +49,19 @@ var preload_images = [
 'images/squiggle_striped_red.png',
 'images/striped.png'
 ]
+
+var preload_instructions = [
+'instructions/fin.svg',
+'instructions/leftkey.png',
+'instructions/page1a.jpg',
+'instructions/page1b.jpg',
+'instructions/page2a.jpg',
+'instructions/page2b.jpg',
+'instructions/page3a.jpg',
+'instructions/page3b.jpg',
+'instructions/page4a.jpg',
+'instructions/page4b.jpg',
+'instructions/page5a.jpg',
+'instructions/page5b.jpg',
+'instructions/rightkey.png'
+]

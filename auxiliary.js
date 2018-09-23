@@ -150,3 +150,15 @@ var explainHTML = function(cards, cards_width, type) {
 		`;
 	return html
 }
+
+var makeInstruction = function({sideA, sideB='', isfirst=false, uid=''} = {}) {
+    var html = `
+        <div style="width:100vw;height:100vh;position:relative;display:table-cell;vertical-align:middle">
+            <img src="${sideA}" style="width:${80*2/3}vw;opacity:${sideB ? .5 : 1}" /><img src="${sideB}" style="width:${80*1/3}vw" />
+            <img src="${!isfirst ? 'instructions/leftkey.png' : ''}" onclick=keydown("leftarrow") style="position:absolute;left:0;bottom:0">
+            <img src="instructions/rightkey.png" onclick=keydown("rightarrow") style="position:absolute;right:0;bottom:0">
+            <p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid}</p>
+        <div>
+        `;
+    return html
+}
