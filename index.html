@@ -152,16 +152,20 @@
 		}
 
 		var instructions = {
+			// enters a never ending loop; each time trial finishes, asks for key; if key correct, breaks and proceeds; else, returns
 			type: 'instructions',
-			pages: ['page 1',
-					'page 2',
-					'page 3',
-					'Fin de las instrucciones. Siguiente para comenzar. Anterior para regresar.'],
+			pages: [`<div style="width:100vw;height:100vh;position:relative;display:table-cell;vertical-align:middle"><img src="instructions/page1a.jpg" style="width:${80*2/3}vw" /><img src="images/leftkey.png" style="position:absolute;left:0;bottom:0"><img src="images/rightkey.png" style="position:absolute;right:0;bottom:0"><div>`,
+					`<img src="instructions/page1a.jpg" style="width:${80*2/3}vw;opacity:.5" /><img src="instructions/page1b.jpg" style="width:${80*1/3}vw" />`,
+					`<img src="instructions/page2a.jpg" style="width:${80*2/3}vw" />`,
+					`<img src="instructions/page2a.jpg" style="width:${80*2/3}vw;opacity:.5" /><img src="instructions/page2b.jpg" style="width:${80*1/3}vw" />`,
+					`<script>window.confirm()<\/script>`
+					],
 			allow_keys: true,  // todo: bug: previous button is not ungreyed when page 2 is displayed
 			allow_backward: true,
-			show_clickable_nav: true,
+			// show_clickable_nav: true,
 			button_label_previous: 'Anterior',  // todo: can't an image be used instead?
-			button_label_next: 'Siguiente'
+			button_label_next: 'Siguiente',
+			data: {}
 		}
 
 		var cards = {
@@ -242,7 +246,7 @@
 			data: {}
 		}
 
-		var timeline = [fullscreen_on, test, winner]
+		var timeline = [instructions, test, winner]
 
 		function sendData(name, data, async){
 			var xhr = new XMLHttpRequest();
