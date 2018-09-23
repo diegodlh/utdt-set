@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+    	<meta charset="utf-8"/>
         <title>My experiment</title>
         <script src="jspsych-6.0.4/jspsych.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
@@ -8,16 +9,75 @@
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script>
         <script type="text/javascript" src="stimuli.json"></script>
         <script src="auxiliary.js"></script>
+        <script src="preload_images.js"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
         <link href="experiment.css" rel="stylesheet" type="text/css"></link>
     </head>
-    <body></body>
+    <body><dialog open>This is an open dialog window</dialog></body>
     <script>
+
+		// var outerWidth_max = window.outerWidth
+		// var outerHeight_max = window.outerHeight
+
+		// window.addEventListener('resize', function( event ) {
+		// 	while (true) {
+		// 		var outerWidth_new = window.outerWidth
+		// 		var outerHeight_new = window.outerHeight
+		// 		console.log(outerWidth_new, outerWidth_max)
+		// 		console.log(outerHeight_new, outerHeight_max)
+		// 		if (outerWidth_new < outerWidth_max || outerHeight_new < outerHeight_max) {
+		// 			window.alert('Por favor, regrese al modo pantalla completa.')
+		// 		} else { break }
+		// 	}
+		// 	outerWidth_max = Math.max(outerWidth_max, outerWidth_new)
+		// 	outerHeight_max = Math.max(outerHeight_max, outerHeight_new)
+		// 	// while(true) {
+		// 	// 	console.log(innerWidth, innerHeight, outerWidth, outerHeight)
+		// 	// 	window.alert()
+		// 	}
+		// })
+
+		var innerWidth_max = window.innerWidth
+		var innerHeight_max = window.innerHeight
+
+		var onresizeFunction = function ( event ) {
+			window.onresize = null
+			// window.removeEventListener('resize', onresizeFunction)
+			var innerWidth_new = window.innerWidth
+			var innerHeight_new = window.innerHeight
+			if (innerWidth_new < innerWidth_max || innerHeight_new < innerHeight_max) {
+				// while(true) {
+				// 	var clave = window.prompt('Por favor, reingrese al modo pantalla completa (F11) y luego ingrese la clave para continuar.')
+				// 	if (clave == 'continuar') { break }
+				// }
+			}
+			innerWidth_max = Math.max(innerWidth_max, innerWidth_new)
+			innerHeight_max = Math.max(innerHeight_max, innerHeight_new)
+			window.onresize = onresizeFunction
+		}
+
+		window.onresize = onresizeFunction
+
+		window.onbeforeunload = function ( event ) {
+			// while (true) {
+			// 	var t0 = Date.now()
+			// 	var clave = window.prompt('Ingrese la clave para salir:')
+			// 	if (Date.now() - t0 < 100) {
+			// 		break
+			// 	} else if (clave == 'salir') {
+			// 		break
+			// 	}
+			// }
+			var clave = window.alert()
+			// Cancel the event as stated by the standard.
+			event.preventDefault();
+			// Chrome requires returnValue to be set.
+			event.returnValue = '';
+		}
 
     	var uid = 1
 		var mode = 'test'
 		
-    	// todo: preload!
   //   	modes = ['test', 'retest']
 
   //   	while (true) {
@@ -31,15 +91,14 @@
 		// }
 
 		var trials = stimuli[uid-1][mode]
+		// var trials = [trials[0]]
 
 		var score = 0
 		var trial_num = 1
 
 		var audio_correct = new Audio('sounds/correct.wav')
 		var audio_wrong = new Audio('sounds/wrong.wav')
-
-    	var pause = false
-    	var abort = false
+		var audio_win = new Audio('sounds/win.wav')
 
     	var keys = {
     		set: '8numpad',
@@ -93,7 +152,7 @@
 			stimulus: function() {
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), score:score, max_score:trials.length, uid:uid, trial_num:trial_num})
 			},
-			choices: [keys.set, keys.noset, keys.pause, keys.abort],  // todo: the problem is that if pause or abort keys are pressed, this part is over
+			choices: [keys.set, keys.noset],  // todo: the problem is that if pause or abort keys are pressed, this part is over
 			data: { trial_part: 'cards'},
 			on_finish: function(data) {
 				data.set = jsPsych.timelineVariable('type', true) >= 0
@@ -114,7 +173,7 @@
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, explain: 'ask',
 					score: score, max_score: trials.length, uid:uid, trial_num:trial_num})
 			},
-			choices: [keys.explain, keys.noexplain, keys.pause, keys.abort],
+			choices: [keys.explain, keys.noexplain],
 			data: { trial_part: 'decision' },
 			on_finish: function(data) {
 				data.explain = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keys.explain)
@@ -145,14 +204,27 @@
 
 		}
 
-		var timeline = [test]
+		var winner = {
+			type: 'html-keyboard-response',
+			stimulus: function() {
+				var html = `
+					<div style="position:relative;background-color:#ffcc00;height:100vh;width:100vw;display:table-cell;vertical-align:middle">
+						<p style="font-size:10vw;margin:0;color:#cc9900">
+							¡Ganaste${score > 0 ? ' ' + score + ' punto' : ''}${score > 1 ? 's' : ''}!
+						</p>
+						<p style="position:absolute;bottom:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid}</p>
+					`;
+				return html
+				},
+			on_load: function() {
+				audio_win.play()},
+				// window.removeEventHandler('beforeunload', )
+			choices: jsPsych.NO_KEYS,
+			data: {}
+		}
 
-		// var preload_images = ['images/coin.svg', 'images/explain.png', 'images/noset.png', 'images/set.png']
-		// for (i = 0; i < trials.length; i++) {
-		// 	preload_images.push(trials[i].cards_img)
-		// 	preload_images.push(trials[i].explain_img)
-		// }    
-		
+		var timeline = [test, winner]
+
 		jsPsych.init({
 		    timeline: timeline,
 		    on_trial_start: function(trial) {
@@ -163,8 +235,12 @@
 		    	data.trial_num = trial_num,
 		    	data.ts_end = Date.now()
 		    },
-		    // preload_images: preload_images,
-		    // preload_audio: ['sounds/correct.wav', 'sounds/wrong.wav'],
+		    preload_images: preload_images,
+	      	on_interaction_data_update: function(data) {
+    			data.ts_start = Date.now(),
+    			data.trial_num = trial_num,
+    			console.log(JSON.stringify(data))
+  			},
 		    on_finish: function(){jsPsych.data.displayData(); }
 		});
 

@@ -51,8 +51,8 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="no", scor
                                 ${cardsHTML(cards)}
                             </td>
                             <td style="width:${(1-cards_width)/2*100}%">
-                                <img src="images/set.png" style="max-width:100%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/><br>
-                                <img src="images/noset.png" style="max-width:100%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
+                                <img src="images/set.png" style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/><br>
+                                <img src="images/noset.png" style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
                             </td>
                         </tr>
                     </table>
@@ -61,7 +61,7 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="no", scor
             <tr style="height:50vh">
             	<td style="background:#AAA;position:relative">
             		${explain_html}
-            		<p style="position:absolute;bottom:0;right:0;margin-bottom:0;margin-right:10px">${uid + '.' + trial_num}</p>
+            		<p style="position:absolute;bottom:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid + '.' + trial_num}</p>
             	</td>
             </tr>
         </table>
@@ -151,7 +151,7 @@ var explainHTML = function(cards, cards_width, type) {
     					</tr>
     				</table>
 	    		<td style="width:${(1-cards_width)/2*100}%">
-	    			<img src="images/${type}.png" style="max-width:100%" />
+	    			<img src="images/${type}.png" style="width:75%" />
 	    		</td>
 			</tr>
 		</table>
