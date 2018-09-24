@@ -79,7 +79,6 @@
 			// 	}
 			// }
 			saveData()
-			var clave = window.alert()
 			// Cancel the event as stated by the standard.
 			event.preventDefault();
 			// Chrome requires returnValue to be set.
@@ -99,11 +98,26 @@
 				var xhr = new XMLHttpRequest();
 				xhr.open('POST', 'write_data.php', false);
 				xhr.setRequestHeader('Content-Type', 'application/json');
-				xhr.send(JSON.stringify({filename: filename, filedata: csvdata}));
+				try {
+					xhr.send(JSON.stringify({filename: filename, filedata: csvdata}));
+				} catch(error) {
+					console.log(error)
+				}
 				if(xhr.status == 200) {
 					console.log(filename + ' successfully saved to server.')
 				} else {
 					window.alert(filename + ' could not be saved to server.')
+					// var dialog = document.createElement('dialog');
+					// dialog.style.cssText = 'top:10px'
+	    // 			dialog.innerHTML = `
+	    // 				<form method="dialog">
+	    // 					${filename} could not be saved to server.
+		   //  				<menu style="text-align:center">
+		   //  					<button>OK</button>
+	    // 					</menu>
+    	// 				</form>
+    	// 				`;
+	    // 			document.body.appendChild(dialog).showModal()
 				}
 			}
 
