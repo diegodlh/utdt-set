@@ -229,7 +229,7 @@ window.jsPsych = (function() {
 
     // for trial-level callbacks, we just want to pass in a reference to the values
     // of the DataCollection, for easy access and editing.
-    var trial_data_values = trial_data.values()[0];
+    var trial_data_values = trial_data.values().slice(-1)[0];
 
     // handle callback at plugin level
     if (typeof current_trial.on_finish === 'function') {

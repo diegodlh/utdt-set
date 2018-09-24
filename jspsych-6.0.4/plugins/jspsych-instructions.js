@@ -143,6 +143,7 @@ jsPsych.plugins.instructions = (function() {
       if (current_page >= trial.pages.length) {
         endTrial();
       } else {
+        jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1])})
         show_current_page();
       }
 
@@ -151,9 +152,11 @@ jsPsych.plugins.instructions = (function() {
     function back() {
 
       add_current_page_to_view_history()
+      jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1])})
 
       current_page--;
 
+      jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1])})
       show_current_page();
     }
 
@@ -184,6 +187,7 @@ jsPsych.plugins.instructions = (function() {
         "rt": (new Date()).getTime() - start_time
       };
 
+      jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1])})
       jsPsych.finishTrial(trial_data);
     }
 
