@@ -177,7 +177,15 @@
 					${uid_string}
 				</p>
 				`,
-			choices: ['enter'],
+			choices: jsPsych.NO_KEYS,
+			on_load: function() {
+				window.addEventListener('keydown', function _listener(event) {
+					if(event.key.toLowerCase() == 's' && event.ctrlKey && event.altKey) {
+						jsPsych.finishTrial()
+						window.removeEventListener('keydown', _listener)
+					}
+				});
+			},
 			data: {}
 		}
 
