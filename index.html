@@ -16,26 +16,11 @@
     <body></body>
     <script>
 
-		// var outerWidth_max = window.outerWidth
-		// var outerHeight_max = window.outerHeight
-
-		// window.addEventListener('resize', function( event ) {
-		// 	while (true) {
-		// 		var outerWidth_new = window.outerWidth
-		// 		var outerHeight_new = window.outerHeight
-		// 		console.log(outerWidth_new, outerWidth_max)
-		// 		console.log(outerHeight_new, outerHeight_max)
-		// 		if (outerWidth_new < outerWidth_max || outerHeight_new < outerHeight_max) {
-		// 			window.alert('Por favor, regrese al modo pantalla completa.')
-		// 		} else { break }
-		// 	}
-		// 	outerWidth_max = Math.max(outerWidth_max, outerWidth_new)
-		// 	outerHeight_max = Math.max(outerHeight_max, outerHeight_new)
-		// 	// while(true) {
-		// 	// 	console.log(innerWidth, innerHeight, outerWidth, outerHeight)
-		// 	// 	window.alert()
-		// 	}
-		// })
+    	// Script tries to save the data when the winner screen is loaded and
+    	// when the session is closed earlier with ctrl+alt+q.
+    	// The script also tries to save the data if the page is tried to be unloaded,
+    	// but in this case now js warnings are given if it fails, because this is not allowed
+    	// in beforeunload listeners.
 
 		var urlParams = new URLSearchParams(window.location.search)
 
@@ -69,15 +54,6 @@
 		}
 
 		var beforeunload = function(event) {
-			// while (true) {
-			// 	var t0 = Date.now()
-			// 	var clave = window.prompt('Ingrese la clave para salir:')
-			// 	if (Date.now() - t0 < 100) {
-			// 		break
-			// 	} else if (clave == 'salir') {
-			// 		break
-			// 	}
-			// }
 			saveData()
 			// Cancel the event as stated by the standard.
 			event.preventDefault();
@@ -107,17 +83,6 @@
 					console.log(filename + ' successfully saved to server.')
 				} else {
 					window.alert(filename + ' could not be saved to server.')
-					// var dialog = document.createElement('dialog');
-					// dialog.style.cssText = 'top:10px'
-	    // 			dialog.innerHTML = `
-	    // 				<form method="dialog">
-	    // 					${filename} could not be saved to server.
-		   //  				<menu style="text-align:center">
-		   //  					<button>OK</button>
-	    // 					</menu>
-    	// 				</form>
-    	// 				`;
-	    // 			document.body.appendChild(dialog).showModal()
 				}
 			}
 
@@ -139,6 +104,22 @@
 				document.body.dispatchEvent(e)
 			}
 		}
+
+		var endExperiment = function(event) {
+			if(event.key.toLowerCase() == 'q' && event.ctrlKey && event.altKey) {
+					jsPsych.endCurrentTimeline()  // exits instructions loop to avoid confirmation prompt
+					jsPsych.pauseExperiment()  // prevent next trial from loading after finishing current trial
+					jsPsych.finishTrial()
+					saveData()
+					jsPsych.endExperiment('La sesión ha finalizado.')
+					jsPsych.resumeExperiment()
+					window.removeEventListener('keydown', endExperiment)
+					window.removeEventListener('resize', onresizeFunction)
+					window.removeEventListener('beforeunload', beforeunload)
+			}
+		}
+
+		window.addEventListener('keydown', endExperiment)
 
 		var uid = urlParams.get('uid')
     	while (true) {
@@ -200,7 +181,6 @@
 		}
 
 		var instructions = {
-			// todo: if exit while running the instructions trial, data is not saved
 			type: 'instructions',
 			pages: [
 				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, isfirst: true}),
@@ -215,11 +195,8 @@
 				makeInstruction({sideA: 'instructions/page5a.jpg', uid: uid_string, sideB: 'instructions/page5b.jpg'}),
 				makeInstruction({sideA: 'instructions/fin.png', uid: uid_string})
 			],
-			allow_keys: true,  // todo: bug: previous button is not ungreyed when page 2 is displayed
+			allow_keys: true,
 			allow_backward: true,
-			// show_clickable_nav: true,
-			button_label_previous: 'Anterior',  // todo: can't an image be used instead?
-			button_label_next: 'Siguiente',
 			data: {},
 		}
 
@@ -244,7 +221,7 @@
 				trial_num += 1
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), score:score, max_score:max_score, uid:uid, trial_num:trial_num})
 			},
-			choices: [keychars.set, keychars.noset],  // todo: the problem is that if pause or abort keys are pressed, this part is over
+			choices: [keychars.set, keychars.noset],
 			data: { trial_part: 'cards'},
 			on_finish: function(data) {
 				data.set = jsPsych.timelineVariable('type', true) >= 0
@@ -253,8 +230,10 @@
 				} else {
 					var correct_key = keychars.noset
 				}
-				data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(correct_key);
-				data.response = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychars.set) ? 'set' : 'noset'
+				if (data.key_press) {
+					data.response = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychars.set) ? 'set' : 'noset'
+					data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(correct_key);
+				}
 			}
 		}
 
@@ -268,7 +247,9 @@
 			choices: [keychars.explain, keychars.noexplain],
 			data: { trial_part: 'decision' },
 			on_finish: function(data) {
-				data.explain = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychars.explain)
+				if (data.key_press) {
+					data.explain = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychars.explain)
+				}
 				score = jsPsych.data.get().select('correct').sum()
 			}
 		}
@@ -290,9 +271,7 @@
 
 		var test = {
 			timeline: [cards, explanation, feedback],
-			timeline_variables: trials
-			// conditional_function: !abort  // todo: this should be checked before each trial part
-
+			timeline_variables: trials,
 		}
 
 		var winner = {
