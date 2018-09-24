@@ -69,8 +69,6 @@
 			// }
 
 			function saveRemote(filename, csvdata) {
-				// todo: handle server down and non-200 responses
-				// todo: change path to php
 				var xhr = new XMLHttpRequest();
 				while(true) {
 					xhr.open('POST', 'write_data.php', false);
