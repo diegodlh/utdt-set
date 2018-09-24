@@ -13,7 +13,7 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="no", scor
 
 	var score_html = ''
     for (i = 0; i < score; i++) {
-    	score_html += '<img src="images/coin.svg" style="width:100%;display:block" />\n'
+    	score_html += '<img src="images/coin.png" style="width:100%;display:block" />\n'
     }
 
     var explain_html
@@ -151,7 +151,7 @@ var explainHTML = function(cards, cards_width, type) {
 	return html
 }
 
-var makeInstruction = function({sideA, sideB='', isfirst=false, uid=''} = {}) {
+var makeInstruction = function({sideA, sideB='', isfirst=false, uid=''  } = {}) {
     var html = `
         <div style="width:100vw;height:100vh;position:relative;display:table-cell;vertical-align:middle">
             <img src="${sideA}" style="width:${80*2/3}vw;opacity:${sideB ? .5 : 1}" /><img src="${sideB}" style="width:${80*1/3}vw" />

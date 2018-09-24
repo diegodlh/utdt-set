@@ -37,28 +37,31 @@
 		// 	}
 		// })
 
+		var urlParams = new URLSearchParams(window.location.search)
+
 		var innerWidth_max = window.innerWidth
 		var innerHeight_max = window.innerHeight
 
 		var onresizeFunction = function ( event ) {
-			window.onresize = null
-			// window.removeEventListener('resize', onresizeFunction)
+			window.removeEventListener('resize', onresizeFunction)
 			var innerWidth_new = window.innerWidth
 			var innerHeight_new = window.innerHeight
 			if (innerWidth_new < innerWidth_max || innerHeight_new < innerHeight_max) {
-				// while(true) {
-				// 	var clave = window.prompt('Por favor, reingrese al modo pantalla completa (F11) y luego ingrese la clave para continuar.')
-				// 	if (clave == 'continuar') { break }
-				// }
+				while(true) {
+					var clave = window.prompt('Por favor, reingrese al modo pantalla completa (F11) y luego ingrese la clave para continuar.')
+					if (clave == 'continuar') { break }
+				}
 			}
 			innerWidth_max = Math.max(innerWidth_max, innerWidth_new)
 			innerHeight_max = Math.max(innerHeight_max, innerHeight_new)
-			window.onresize = onresizeFunction
+			window.addEventListener('resize', onresizeFunction)
 		}
 
-		window.onresize = onresizeFunction
+		if (!urlParams.get('ignoreresize')) {
+			window.addEventListener('resize', onresizeFunction)
+		}
 
-		window.onbeforeunload = function ( event ) {
+		var beforeunload = function(event) {
 			// while (true) {
 			// 	var t0 = Date.now()
 			// 	var clave = window.prompt('Ingrese la clave para salir:')
@@ -75,6 +78,8 @@
 			// Chrome requires returnValue to be set.
 			event.returnValue = '';
 		}
+
+		window.addEventListener('beforeunload', beforeunload)
 
 		var saveData = function(async) {
 			var basename = uid_string + mode + jsPsych.startTime().toISOString()
@@ -100,29 +105,36 @@
 			}
 		}
 
-		document.body.addEventListener("click", function(e) {console.log(e.keyCode)})
+		var uid = urlParams.get('uid')
+    	while (true) {
+    		if (uid) {
+    			if (stimuli[uid-1]) { break }
+    		}
+    		var uid = window.prompt('uid:', '')    		
+		}
 
-    	var uid = 1
-		var mode = 'retest'
-		
-  //   	modes = ['test', 'retest']
+		modes = ['test', 'retest']
+		var mode = urlParams.get('mode')    	
+		while (true) {
+			if (mode) {
+				if (mode in stimuli[uid-1]) { break }
+			}
+			var mode = modes[window.prompt('1 (test) / 2 (retest):', '') - 1]
+		}
 
-  //   	while (true) {
-  //   		var uid = window.prompt('uid:', '')
-  //   		if (stimuli[uid-1]) { break; }
-		// }
-
-		// while (true) {
-		// 	var mode = modes[window.prompt('1 (test) / 2 (retest):', '') - 1]
-		// 	if (mode in stimuli[uid-1]) { break; }
-		// }
 
 		var trials = stimuli[uid-1][mode]
-		// var trials = [trials[0]]
+		var trial_num = 0
+		var max_score = trials.length
+		
+		var startwith = urlParams.get('startwith')
+		if (startwith > 0 && startwith <= trials.length) {
+			trials = trials.slice(startwith - 1)	
+			trial_num = startwith - 1
+		}
 
 		var uid_string = uid.toString().padStart(3, '0')
 		var score = 0
-		var trial_num = 0
 
 		var audio_correct = new Audio('sounds/correct.mp3')
 		var audio_wrong = new Audio('sounds/wrong.mp3')
@@ -153,7 +165,7 @@
 		}
 
 		var instructions = {
-			// enters a never ending loop; each time trial finishes, asks for key; if key correct, breaks and proceeds; else, returns
+			// todo: if exit while running the instructions trial, data is not saved
 			type: 'instructions',
 			pages: [
 				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, isfirst: true}),
@@ -195,7 +207,7 @@
 			type: 'html-keyboard-response',
 			stimulus: function() {
 				trial_num += 1
-				return makeHTML({cards: jsPsych.timelineVariable('cards', true), score:score, max_score:trials.length, uid:uid, trial_num:trial_num})
+				return makeHTML({cards: jsPsych.timelineVariable('cards', true), score:score, max_score:max_score, uid:uid, trial_num:trial_num})
 			},
 			choices: [keychars.set, keychars.noset],  // todo: the problem is that if pause or abort keys are pressed, this part is over
 			data: { trial_part: 'cards'},
@@ -216,7 +228,7 @@
 			stimulus: function() {
 				var response = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].response				
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, explain: 'ask',
-					score: score, max_score: trials.length, uid:uid, trial_num:trial_num})
+					score: score, max_score: max_score, uid:uid, trial_num:trial_num})
 			},
 			choices: [keychars.explain, keychars.noexplain],
 			data: { trial_part: 'decision' },
@@ -234,7 +246,7 @@
 				var response = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].response
 				var type = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].set ? 'set' : 'noset'
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, cards_bg: correct ? 'lawngreen' : 'red',
-					explain: explain ? type : 'no', score: score, max_score: trials.length, uid:uid, trial_num:trial_num, next:true})
+					explain: explain ? type : 'no', score: score, max_score: max_score, uid:uid, trial_num:trial_num, next:true})
 		    },
 			choices: [keychars.next],
 			data: { trial_part: 'feedback' },
@@ -256,14 +268,14 @@
 						<p style="font-size:10vw;margin:0;color:#cc9900">
 							¡Ganaste${score > 0 ? ' ' + score + ' punto' : ''}${score > 1 ? 's' : ''}!
 						</p>
-						<p style="position:absolute;bottom:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid}</p>
+						<p style="position:absolute;bottom:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid_string}</p>
 					`;
 				return html
 				},
 			on_load: function() {
 				audio_win.play()
 				saveData()
-				// window.removeEventHandler('beforeunload', )
+				window.removeEventListener('beforeunload', beforeunload)
 			},
 			choices: jsPsych.NO_KEYS,
 			data: {}
@@ -289,6 +301,7 @@
     	}
 
 		jsPsych.init({
+			// todo: record client's ip or hostname (http://net.ipcalf.com/)
 		    timeline: timeline,
 		    on_trial_start: function(trial) {
 		    	trial.data.ts_start = Date.now()
