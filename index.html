@@ -72,17 +72,20 @@
 				// todo: handle server down and non-200 responses
 				// todo: change path to php
 				var xhr = new XMLHttpRequest();
-				xhr.open('POST', 'write_data.php', false);
-				xhr.setRequestHeader('Content-Type', 'application/json');
-				try {
-					xhr.send(JSON.stringify({filename: filename, filedata: csvdata}));
-				} catch(error) {
-					console.log(error)
-				}
-				if(xhr.status == 200) {
-					console.log(filename + ' successfully saved to server.')
-				} else {
-					window.alert(filename + ' could not be saved to server.')
+				while(true) {
+					xhr.open('POST', 'write_data.php', false);
+					xhr.setRequestHeader('Content-Type', 'application/json');
+					try {
+						xhr.send(JSON.stringify({filename: filename, filedata: csvdata}));
+					} catch(error) {
+						console.log(error)
+					}
+					if(xhr.status == 200) {
+						console.log(filename + ' successfully saved to server.')
+						break
+					} else {
+						if (!window.confirm(filename + ' could not be saved to server. Try again?')) { break }
+					}
 				}
 			}
 
