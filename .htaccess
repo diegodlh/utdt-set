@@ -2,3 +2,6 @@
 Header set Access-Control-Allow-Origin "*"
 Header set Access-Control-Allow-Headers "Content-Type"
 </Files>
+<Files test.mp4>
+Header set Accept-Ranges none
+</Files>

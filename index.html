@@ -143,12 +143,17 @@
 
 		// only if mode is test, preloads the video file
 		var video = 'video/test.mp4'
+		var video_preloaded = false
 		if (mode == 'test') {
 			var preloadLink = document.createElement("link");
 			preloadLink.href = video;
 			preloadLink.rel = "preload";
 			preloadLink.as = "video";
+			preloadLink.setAttribute("onload", "onVideoPreload()");
 			document.head.appendChild(preloadLink);
+		}
+		var onVideoPreload = function() {
+			video_preloaded = true
 		}
 
 		var trials = stimuli[uid-1][mode]
@@ -192,8 +197,13 @@
 			on_load: function() {
 				window.addEventListener('keydown', function _listener(event) {
 					if(event.key.toLowerCase() == 's' && event.ctrlKey && event.altKey) {
-						jsPsych.finishTrial()
-						window.removeEventListener('keydown', _listener)
+						if (mode != 'test' || video_preloaded) {
+							// if in test mode, hold screen can only be closed if video has been preloaded successfully
+							jsPsych.finishTrial()
+							window.removeEventListener('keydown', _listener)
+						} else {
+							window.alert(video + ' not preloaded!')
+						}
 					}
 				});
 			},
@@ -203,6 +213,8 @@
 		var video_trial = {
 			// todo: play button sin controles?
 			// todo: modificar plugin para que no avance automáticamente
+			// set Accept-Ranges header for video/filename.mp4 to none in .htaccess
+			// remember to AllowOverride All for Directory in sites-available/site.conf
 			type: 'video',
 			sources: ['video/test.mp4', 'video/test.webm'],
 			width: 640,
