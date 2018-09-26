@@ -215,6 +215,7 @@
 			// todo: modificar plugin para que no avance automáticamente
 			// set Accept-Ranges header for video/filename.mp4 to none in .htaccess
 			// remember to AllowOverride All for Directory in sites-available/site.conf
+			// Allow watching max twice or set timeout
 			type: 'video',
 			sources: ['video/test.mp4', 'video/test.webm'],
 			width: 640,
@@ -225,6 +226,7 @@
 		}
 
 		var instructions = {
+			// set timeout; idem test below (I think it should be continuous, without pauses)
 			type: 'instructions',
 			pages: [
 				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, isfirst: true}),
@@ -314,6 +316,8 @@
 		}
 
 		var test = {
+			// set test timeout; as this will be a cutoff for extraordinarily long sessions, I think it shouldn't pause if bathroom, etc
+			// if still pause is desired, check stackoverflow 3969475
 			timeline: [cards, explanation, feedback],
 			timeline_variables: trials,
 		}
