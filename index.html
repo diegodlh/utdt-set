@@ -7,10 +7,12 @@
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-video.js"></script>
         <script type="text/javascript" src="stimuli.json"></script>
         <script src="auxiliary.js"></script>
         <script src="preload_images.js"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+
         <!-- <link href="experiment.css" rel="stylesheet" type="text/css"></link> -->
     </head>
     <body></body>
@@ -139,6 +141,15 @@
 			var mode = modes[window.prompt('1 (test) / 2 (retest):', '') - 1]
 		}
 
+		// only if mode is test, preloads the video file
+		var video = 'video/test.mp4'
+		if (mode == 'test') {
+			var preloadLink = document.createElement("link");
+			preloadLink.href = video;
+			preloadLink.rel = "preload";
+			preloadLink.as = "video";
+			document.head.appendChild(preloadLink);
+		}
 
 		var trials = stimuli[uid-1][mode]
 		var trial_num = 0
@@ -186,6 +197,18 @@
 					}
 				});
 			},
+			data: {}
+		}
+
+		var video_trial = {
+			// todo: play button sin controles?
+			// todo: modificar plugin para que no avance automáticamente
+			type: 'video',
+			sources: ['video/test.mp4', 'video/test.webm'],
+			width: 640,
+			height: 360,
+			autoplay: false,
+			controls: false,
 			data: {}
 		}
 
@@ -306,7 +329,7 @@
 		}
 
 		// var timeline = [fullscreen_on]  // going fullscreen with the fullscreen plugin causes js dialogs to exit fullscreen mode
-		var timeline = []
+		var timeline = [hold, video_trial]
 		if (mode == 'retest') {
 			timeline.push(instructions_loop)
 		}
