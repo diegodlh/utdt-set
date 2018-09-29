@@ -16,6 +16,80 @@
     <body></body>
     <script>
 
+    	var tmin_instructions = 180
+    	var timeout_instructions = 600
+    	var timeout_game = 600
+    	var prewarn = 60
+
+    	function Timer(user_callback, delay, prewarn) {
+    		var timerId, start, remaining = (delay-prewarn)*1000;
+    		var callback = function() {
+    			timerId = undefined;
+    			var div = document.createElement('div')
+    			div.id = 'timewarning'
+    			div.style = 'position:absolute;top:10px;left:50vw;transform:translateX(-50%)'
+    			div.innerHTML = `
+    				<span style="background:black;color:red;font-weight:bold;padding:5px">
+    					QUEDA MENOS DE ${Math.ceil(prewarn/60)} MINUTO${Math.ceil(prewarn/60)>1 ? 'S' : ''}
+					</span>
+    				`;
+    			document.body.appendChild(div)
+    			remaining -= new Date() - start;
+    			remaining += prewarn*1000;
+    			callback = user_callback
+    			resume()
+    		}
+
+		    var resume = function() {
+		    	if (!timerId) {
+			        start = new Date();
+			        timerId = window.setTimeout(callback, remaining);
+			        console.log('timer started');
+			    };
+		    };		    
+
+		    this.pause = function() {
+		        if (timerId) {
+		        	this.clear();
+			        remaining -= new Date() - start;
+			        start = undefined;
+			    };
+		    };
+
+		    this.background = function() {
+		    	if (timerId) {
+		    		console.log('timer to background');
+		    		this.clear();		    		
+		    	};
+		    };
+
+		    this.foreground = function() {
+		    	if (!timerId) {
+		    		remaining -= new Date() - start;
+		    		console.log('timer to foreground');
+		    		resume()
+			    };
+		    };
+
+		    this.clear = function() {
+		    	if (timerId) {
+			    	window.clearTimeout(timerId);
+			    	timerId = undefined;
+			    	console.log('timer cleared')
+			    };
+		    };
+
+		    resume();
+		}
+    	var timer = null
+
+    	var removeTimeWarning = function() {
+    		timewarning = document.getElementById('timewarning')
+    		if (timewarning) {
+    			timewarning.parentNode.removeChild(timewarning)
+    		}
+    	}
+
     	// Script tries to save the data when the winner screen is loaded and
     	// when the session is closed earlier with ctrl+alt+q.
     	// The script also tries to save the data if the page is tried to be unloaded,
@@ -40,8 +114,12 @@
 			var innerHeight_new = window.innerHeight
 			if (innerWidth_new < innerWidth_max || innerHeight_new < innerHeight_max) {
 				while(true) {
+					if (timer) { timer.background() }
 					var clave = window.prompt('Por favor, reingrese al modo pantalla completa (F11) y luego ingrese la clave para continuar.')
-					if (clave == 'continuar') { break }
+					if (clave == 'continuar') { 
+						if (timer) { timer.foreground() }
+						break
+					}
 				}
 			}
 			innerWidth_max = Math.max(innerWidth_max, innerWidth_new)
@@ -108,6 +186,11 @@
 
 		var endExperiment = function(event) {
 			if(event.key.toLowerCase() == 'q' && event.ctrlKey && event.altKey) {
+					if (timer) { 
+						timer.clear();
+						timer = null;
+					};
+					removeTimeWarning()
 					jsPsych.endCurrentTimeline()  // exits instructions loop to avoid confirmation prompt
 					jsPsych.pauseExperiment()  // prevent next trial from loading after finishing current trial
 					jsPsych.finishTrial()
@@ -149,7 +232,7 @@
 			preloadLink.as = "video";
 			preloadLink.setAttribute("onload", "onVideoPreload()");
 			document.head.appendChild(preloadLink);
-		}
+		}	
 		var onVideoPreload = function() {
 			video_preloaded = true
 		}
@@ -220,6 +303,7 @@
 			height: 360,
 			autoplay: false,
 			controls: false,
+			on_load: function() { removeTimeWarning() },
 			data: {}
 		}
 
@@ -242,7 +326,11 @@
 			allow_keys: true,
 			allow_backward: true,
 			show_clickable_nav: true,
-			tmin: 15,
+			tmin: function() {
+				if (jsPsych.data.get().filter({trial_type: 'instructions'}).count()) {
+					return 0
+				} else { return tmin_instructions }
+			},
 			data: {},
 		}
 
@@ -251,12 +339,33 @@
 			timeline: [instructions],
 			loop_function: function() {
 				while(true) {
+					if (timer) { timer.background() }
 					var clave = window.prompt('Ingrese la clave para continuar:')
 					if(clave == 'continuar') {
+						if (timer) {
+							timer.clear()
+							timer = null
+						}
+						removeTimeWarning()
 						return false
-					} else if(clave == 'regresar') {
-						return true }
-
+					} else { 
+						if (timer) { timer.foreground() }
+						return true
+					}
+				}
+			},
+			on_load: function() {
+				if (!timer) {
+					timer = new Timer(function() {
+						timer = null
+						removeTimeWarning()
+						jsPsych.endCurrentTimeline()
+						jsPsych.finishTrial()
+						while(true) {
+							var clave = window.prompt('El tiempo se agotó. Ingrese la clave para continuar:')
+							if (clave == 'continuar') { break }
+						}
+					}, timeout_instructions, prewarn)
 				}
 			}
 		}
@@ -335,6 +444,11 @@
 				return html
 				},
 			on_load: function() {
+				if (timer) { 
+					timer.clear();
+					timer = null;
+				};
+				removeTimeWarning()
 				audio_win.play()
 				setTimeout(saveData, 100)
 				window.removeEventListener('resize', onresizeFunction)
