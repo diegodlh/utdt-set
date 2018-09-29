@@ -429,6 +429,16 @@
 			// if still pause is desired, check stackoverflow 3969475
 			timeline: [cards, explanation, feedback],
 			timeline_variables: trials,
+			on_load: function() {
+				if (!timer) {
+					timer = new Timer(function() {
+						timer = null
+						removeTimeWarning()
+						jsPsych.endCurrentTimeline()
+						jsPsych.finishTrial()
+					}, timeout_game, prewarn)
+				}
+			}
 		}
 
 		var winner = {
