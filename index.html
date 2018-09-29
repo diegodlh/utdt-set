@@ -308,6 +308,7 @@
 			height: 360,
 			autoplay: false,
 			controls: false,
+			uid: uid_string,
 			on_load: function() { removeTimeWarning() },
 			data: {}
 		}
@@ -477,9 +478,9 @@
 		var timeline = [hold]
 		if (mode == 'retest') {
 			timeline.push(instructions_loop)
-		}// else if (mode == 'test') {
-		//	timeline.push(video_trial)
-		// }
+		} else if (mode == 'test') {
+			timeline.push(video_trial)
+		}
 		timeline.push(test, winner)
 
 		var preload = [preload_images]

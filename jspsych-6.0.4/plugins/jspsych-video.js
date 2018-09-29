@@ -63,6 +63,12 @@ jsPsych.plugins.video = (function() {
         pretty_name: 'Stop',
         default: null,
         description: 'Time to stop the clip.'
+      },
+      uid: {
+        type: jsPsych.plugins.parameterType.STRING,
+        pretty_name: 'User ID',
+        default: '',
+        description: 'Zero-padded user ID to print on screen.'
       }
     }
   }
@@ -112,6 +118,10 @@ jsPsych.plugins.video = (function() {
     if (trial.prompt !== null) {
       video_html += trial.prompt;
     }
+
+    video_html += `
+      <p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${trial.uid}</p>
+    `;
 
     display_element.innerHTML = video_html;
 
