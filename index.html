@@ -194,8 +194,14 @@
 					jsPsych.endCurrentTimeline()  // exits instructions loop to avoid confirmation prompt
 					jsPsych.pauseExperiment()  // prevent next trial from loading after finishing current trial
 					jsPsych.finishTrial()
-					saveData()
-					jsPsych.endExperiment('La sesión ha finalizado.')
+					setTimeout(saveData, 100)
+					jsPsych.endExperiment(`
+						<p>La sesión ha finalizado.</p>
+						<p style="position:absolute;bottom:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">
+							${uid_string}
+						</p>
+						`
+					)
 					jsPsych.resumeExperiment()
 					window.removeEventListener('keydown', endExperiment)
 					window.removeEventListener('resize', onresizeFunction)
