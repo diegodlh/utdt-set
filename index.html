@@ -232,9 +232,14 @@
 			preloadLink.as = "video";
 			preloadLink.setAttribute("onload", "onVideoPreload()");
 			document.head.appendChild(preloadLink);
-		}	
+		}
+
+		var stylesheet = document.createElement('style')
+	    stylesheet.innerHTML = '#holdscreen {background-color:red;}'
+	    stylesheet = document.head.appendChild(stylesheet)
 		var onVideoPreload = function() {
 			video_preloaded = true
+			stylesheet.innerHTML = '#holdscreen {background-color:#AAA;}'
 		}
 
 		var trials = stimuli[uid-1][mode]
@@ -270,7 +275,7 @@
 		var hold = {
 			type: 'html-keyboard-response',
 			stimulus: `
-				<p style="background-color:#AAA;height:100vh;width:100vw;font-size:75vh;margin:0;display:table-cell;vertical-align:middle">
+				<p id="holdscreen" style="height:100vh;width:100vw;font-size:75vh;margin:0;display:table-cell;vertical-align:middle">
 					${uid_string}
 				</p>
 				`,
