@@ -160,7 +160,21 @@
 						console.log(filename + ' successfully saved to server.')
 						break
 					} else {
-						if (!window.confirm(filename + ' could not be saved to server. Try again?')) { break }
+						if (!window.confirm(filename + ' could not be saved to server. Try again?')) {
+							localStorage.setItem(filename, csvdata)
+							var blob = new Blob([csvdata], {type: 'text/csv'})
+							var a = document.createElement('a')
+							var url = URL.createObjectURL(blob)
+							a.href = url
+							a.download = filename + '.csv'
+							document.body.appendChild(a)
+							a.click()
+							setTimeout(function() {
+								document.body.removeChild(a)
+								window.URL.revokeObjectURL(url)
+							}, 0)
+							break
+						}
 					}
 				}
 			}
@@ -241,7 +255,7 @@
 		}
 
 		var stylesheet = document.createElement('style')
-	    stylesheet.innerHTML = '#holdscreen {background-color:red;}'
+	    stylesheet.innerHTML = `#holdscreen {background-color:${mode=='test' ? 'red' : '#AAA'};}`
 	    stylesheet = document.head.appendChild(stylesheet)
 		var onVideoPreload = function() {
 			video_preloaded = true
