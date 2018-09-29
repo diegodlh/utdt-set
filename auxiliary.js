@@ -6,7 +6,7 @@ var keychars = {
     next: '5numpad'
 }
 
-var makeHTML = function({cards, cards_bg="#AAA", response="", explain="no", score=0, max_score, uid, trial_num, next=false} = {}) {
+var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=0, max_score, uid, trial_num, next=false} = {}) {
 	var cards_width = .6
 	var uid = uid.toString().padStart(3, '0')
 	var trial_num = trial_num.toString().padStart(2, '0')
@@ -16,13 +16,16 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="no", scor
     	score_html += '<img src="images/coin.png" style="width:100%;display:block" />\n'
     }
 
-    var explain_html
+    var explain_html = ''
     if(explain=='ask') {
     	explain_html = `
             <img src="images/help.png" onclick=keydown("${keychars.explain}") style="height:25vh;margin:5vw"/>
             <img src="images/nohelp.png" onclick=keydown("${keychars.noexplain}") style="height:25vh;margin:5vw"/>`
     } else if(explain=='no') {
-    	explain_html = ''
+    	explain_html = `
+            <img src="images/help.png" style="height:25vh;margin:5vw;visibility:hidden"/>
+            <img src="images/nohelp.png" style="height:25vh;margin:5vw;opacity:.75"/>
+            `;
     } else if(explain=='set' || explain=='noset') {
     	var type = explain
     	explain_html = explainHTML(cards, cards_width, type)
@@ -99,7 +102,9 @@ var explainHTML = function(cards, cards_width, type) {
     var html = `
 		<table style="width:100%">
 			<tr>
-				<td style="width:${(1-cards_width)/2*100}%"></td>
+				<td style="width:${(1-cards_width)/2*100}%">
+                    <img src="images/help.png" style="width:50%;opacity:.75"/>
+                </td>
 				<td style="width:${cards_width*100}%">
 					<table cellpadding=0 style="border-spacing:20px;width:100%">
 						<tr>

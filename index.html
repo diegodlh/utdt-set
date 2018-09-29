@@ -345,10 +345,12 @@
 		}
 
 		// var timeline = [fullscreen_on]  // going fullscreen with the fullscreen plugin causes js dialogs to exit fullscreen mode
-		var timeline = [hold, video_trial]
-		if (mode == 'retest') {
-			timeline.push(instructions_loop)
-		}
+		var timeline = []
+		// if (mode == 'retest') {
+		// 	timeline.push(instructions_loop)
+		// } else if (mode == 'test') {
+		// 	timeline.push(video_trial)
+		// }
 		timeline.push(test, winner)
 
 		var preload = [preload_images]
