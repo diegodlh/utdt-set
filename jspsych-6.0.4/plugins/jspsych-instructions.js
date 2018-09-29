@@ -74,6 +74,12 @@ jsPsych.plugins.instructions = (function() {
         pretty_name: 'Button label next',
         default: 'Next',
         description: 'The text that appears on the button to go forwards.'
+      },
+      tmin: {
+        type: jsPsych.plugins.parameterType.INT,
+        pretty_name: 'Minimum time.',
+        default: 0,
+        description: 'The minimum time in seconds that the instructions will be shown before allowing to proceed to the next trial.'
       }
     }
   }
@@ -141,7 +147,9 @@ jsPsych.plugins.instructions = (function() {
 
       // if done, finish up...
       if (current_page >= trial.pages.length) {
-        endTrial();
+        if (endable) {
+          endTrial();
+        }
       } else {
         jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1])})
         show_current_page();
@@ -214,6 +222,14 @@ jsPsych.plugins.instructions = (function() {
 
     };
 
+    var endable;
+    var stylesheet = document.createElement('style')
+    stylesheet.innerHTML = '#lastnext {visibility:hidden;}'
+    stylesheet = document.head.appendChild(stylesheet)
+    setTimeout(function() {
+      endable=true;
+      stylesheet.innerHTML = '#lastnext {visibility:visible;}'
+    }, trial.tmin*1000);
     show_current_page();
 
     if (trial.allow_keys) {

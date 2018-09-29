@@ -12,8 +12,6 @@
         <script src="auxiliary.js"></script>
         <script src="preload_images.js"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
-
-        <!-- <link href="experiment.css" rel="stylesheet" type="text/css"></link> -->
     </head>
     <body></body>
     <script>
@@ -239,10 +237,12 @@
 				makeInstruction({sideA: 'instructions/page4a.jpg', uid: uid_string, sideB: 'instructions/page4b.jpg'}),
 				makeInstruction({sideA: 'instructions/page5a.jpg', uid: uid_string}),
 				makeInstruction({sideA: 'instructions/page5a.jpg', uid: uid_string, sideB: 'instructions/page5b.jpg'}),
-				makeInstruction({sideA: 'instructions/fin.png', uid: uid_string})
+				makeInstruction({sideA: 'instructions/fin.png', uid: uid_string, islast: true})
 			],
 			allow_keys: true,
 			allow_backward: true,
+			show_clickable_nav: true,
+			tmin: 15,
 			data: {},
 		}
 
@@ -345,11 +345,11 @@
 		}
 
 		// var timeline = [fullscreen_on]  // going fullscreen with the fullscreen plugin causes js dialogs to exit fullscreen mode
-		var timeline = []
-		// if (mode == 'retest') {
-		// 	timeline.push(instructions_loop)
-		// } else if (mode == 'test') {
-		// 	timeline.push(video_trial)
+		var timeline = [hold]
+		if (mode == 'retest') {
+			timeline.push(instructions_loop)
+		}// else if (mode == 'test') {
+		//	timeline.push(video_trial)
 		// }
 		timeline.push(test, winner)
 
