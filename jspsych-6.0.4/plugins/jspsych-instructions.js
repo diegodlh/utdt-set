@@ -160,7 +160,6 @@ jsPsych.plugins.instructions = (function() {
     function back() {
 
       add_current_page_to_view_history()
-      jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1])})
 
       current_page--;
 
