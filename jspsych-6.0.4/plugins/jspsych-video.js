@@ -11,6 +11,8 @@ jsPsych.plugins.video = (function() {
 
   var plugin = {};
 
+  jsPsych.pluginAPI.registerPreload('video', 'audio_after', 'audio');
+
   plugin.info = {
     name: 'video',
     description: '',
@@ -87,6 +89,12 @@ jsPsych.plugins.video = (function() {
         pretty_name: 'Key backward',
         default: 'leftarrow',
         description: 'The key that the subject can press to play the video again.'
+      },
+      audio_after: {
+        type: jsPsych.plugins.parameterType.AUDIO,
+        pretty_name: 'Audio after video.',
+        default: null,
+        description: 'Audio to play after video if additional views are still available.'
       }
     }
   }
@@ -148,6 +156,9 @@ jsPsych.plugins.video = (function() {
 
     display_element.innerHTML = video_html;
 
+    // setup audio after video stimulus
+    var audio = new Audio(trial.audio_after);
+
     var views = 0;
     display_element.querySelector('#jspsych-video-player').onended = function(){
       if (views == trial.max_views) {
@@ -155,6 +166,9 @@ jsPsych.plugins.video = (function() {
       } else {
         document.getElementById('video-next').style.visibility = 'visible';
         document.getElementById('video-back').style.visibility = 'visible';
+        // start audio
+        audio.play();
+
         jsPsych.pluginAPI.getKeyboardResponse({
           callback_function: end_trial,
           valid_responses: [trial.key_forward],
@@ -162,6 +176,9 @@ jsPsych.plugins.video = (function() {
         listener_backward = jsPsych.pluginAPI.getKeyboardResponse({
           callback_function: function() {
             document.getElementById('video-back').style.visibility = 'hidden';
+            // stop the audio file if it is playing
+            audio.pause();
+
             jsPsych.pluginAPI.cancelKeyboardResponse(listener_backward);
             display_element.querySelector('#jspsych-video-player').currentTime = 0;
             display_element.querySelector('#jspsych-video-player').play();
@@ -194,6 +211,9 @@ jsPsych.plugins.video = (function() {
 
       jsPsych.pluginAPI.cancelAllKeyboardResponses()
 
+      // stop the audio file if it is playing
+      audio.pause();
+      
       // gather the data to store for the trial
       var trial_data = {
         "view_history": JSON.stringify(view_history),

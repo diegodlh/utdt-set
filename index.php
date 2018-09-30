@@ -8,6 +8,7 @@
         <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-video.js"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js"></script>
         <script type="text/javascript" src="stimuli.json"></script>
         <script src="auxiliary.js"></script>
         <script src="preload_images.js"></script>
@@ -19,6 +20,7 @@
     	var tmin_instructions = 10
     	var timeout_instructions = 300
     	var timeout_game = 300
+    	var timeout_known = 30
     	var prewarn = 60
 		var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>'
 
@@ -322,6 +324,16 @@
 			data: {}
 		}
 
+		var known_trial = {
+    		type: 'audio-keyboard-response',
+    		stimulus: 'sounds/known.mp3',
+    		choices: ['s', 'n'],
+    		prompt: '<img src="images/known.png" style="height:75vh"/img>',
+    		trial_duration: timeout_known*1000,
+  			response_ends_trial: true,
+  			data: {}
+		};
+
 		var video_trial = {
 			// set Accept-Ranges header for video/filename.mp4 to none in .htaccess
 			// remember to AllowOverride All for Directory in sites-available/site.conf
@@ -336,6 +348,7 @@
 			uid: uid_string,
 			max_views: 2,
 			key_forward: keychars.next,
+			audio_after: 'sounds/after.mp3',
 			on_load: function() { removeTimeWarning() },
 			data: {}
 		}
@@ -517,6 +530,7 @@
 		if (mode == 'retest') {
 			timeline.push(instructions_loop)
 		} else if (mode == 'test') {
+			timeline.push(known_trial)
 			timeline.push(video_trial)
 		}
 		timeline.push(test, winner)
@@ -525,6 +539,7 @@
     	if (mode == 'retest') {
     		preload.push(preload_instructions)
     	}
+    	preload.push('images/known.png')
 
 		jsPsych.init({
 		    timeline: timeline,
