@@ -69,12 +69,33 @@ jsPsych.plugins.video = (function() {
         pretty_name: 'User ID',
         default: '',
         description: 'Zero-padded user ID to print on screen.'
+      },
+      max_views: {
+        type: jsPsych.plugins.parameterType.INT,
+        pretty_name: 'Maximum number of views.',
+        default: 1,
+        description: 'Maximum number of views before proceeding automatically.'
+      },
+      key_forward: {
+        type: jsPsych.plugins.parameterType.KEYCODE,
+        pretty_name: 'Key forward',
+        default: 'rightarrow',
+        description: 'The key the subject can press in order to end the trial.'
+      },
+      key_backward: {
+        type: jsPsych.plugins.parameterType.KEYCODE,
+        pretty_name: 'Key backward',
+        default: 'leftarrow',
+        description: 'The key that the subject can press to play the video again.'
       }
     }
   }
 
 
   plugin.trial = function(display_element, trial) {
+
+    var view_history = [];
+    var start_time = (new Date()).getTime();
 
     // display stimulus
     var video_html = '<video id="jspsych-video-player" width="'+trial.width+'" height="'+trial.height+'" '
@@ -120,17 +141,42 @@ jsPsych.plugins.video = (function() {
     }
 
     video_html += `
+      <img id="video-next" src="images/next.png" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:10%;visibility:hidden" />
+      <img id="video-back" src="instructions/leftkey.png" style="position:absolute;left:0;bottom:0;visibility:hidden">
       <p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${trial.uid}</p>
     `;
 
     display_element.innerHTML = video_html;
 
+    var views = 0;
     display_element.querySelector('#jspsych-video-player').onended = function(){
-      end_trial();
+      if (views == trial.max_views) {
+        end_trial();
+      } else {
+        document.getElementById('video-next').style.visibility = 'visible';
+        document.getElementById('video-back').style.visibility = 'visible';
+        jsPsych.pluginAPI.getKeyboardResponse({
+          callback_function: end_trial,
+          valid_responses: [trial.key_forward],
+        });
+        listener_backward = jsPsych.pluginAPI.getKeyboardResponse({
+          callback_function: function() {
+            document.getElementById('video-back').style.visibility = 'hidden';
+            jsPsych.pluginAPI.cancelKeyboardResponse(listener_backward);
+            display_element.querySelector('#jspsych-video-player').currentTime = 0;
+            display_element.querySelector('#jspsych-video-player').play();
+          },
+          valid_responses: [trial.key_backward],
+        });
+      }
     }
 
     // event handler to set timeout to end trial if video is stopped
     display_element.querySelector('#jspsych-video-player').onplay = function(){
+      if (display_element.querySelector('#jspsych-video-player').currentTime == 0) {
+        views += 1;
+        view_history.push((new Date()).getTime());
+      };
       if(trial.stop !== null){
         if(trial.start == null){
           trial.start = 0;
@@ -146,9 +192,12 @@ jsPsych.plugins.video = (function() {
     // function to end trial when it is time
     var end_trial = function() {
 
+      jsPsych.pluginAPI.cancelAllKeyboardResponses()
+
       // gather the data to store for the trial
       var trial_data = {
-        stimulus: JSON.stringify(trial.sources)
+        "view_history": JSON.stringify(view_history),
+        "rt": (new Date()).getTime() - start_time
       };
 
       // clear the display
@@ -157,6 +206,21 @@ jsPsych.plugins.video = (function() {
       // move on to the next trial
       jsPsych.finishTrial(trial_data);
     };
+
+    var after_response = function(info) {
+      if (jsPsych.pluginAPI.compareKeys(info.key, trial.key_backward)) {
+
+        if (current_page !== 0 && trial.allow_backward) {
+          back();
+        }
+      }
+
+      if (jsPsych.pluginAPI.compareKeys(info.key, trial.key_forward)) {
+        next();
+      }
+
+
+    }
 
   };
 

@@ -243,7 +243,7 @@
 		}
 
 		// only if mode is test, preloads the video file
-		var video = 'video/test.mp4'
+		var video = 'video/proced.mp4'
 		var video_preloaded = false
 		if (mode == 'test') {
 			var preloadLink = document.createElement("link");
@@ -323,12 +323,14 @@
 			// remember to AllowOverride All for Directory in sites-available/site.conf
 			// Allow watching max twice or set timeout
 			type: 'video',
-			sources: ['video/test.mp4', 'video/test.webm'],
-			width: 640,
-			height: 360,
-			autoplay: false,
+			sources: ['video/proced.mp4'],
+			width: 960,
+			height: 545,
+			autoplay: true,
 			controls: false,
 			uid: uid_string,
+			max_views: 2,
+			key_forward: keychars.next,
 			on_load: function() { removeTimeWarning() },
 			data: {}
 		}
