@@ -95,6 +95,12 @@ jsPsych.plugins.video = (function() {
         pretty_name: 'Audio after video.',
         default: null,
         description: 'Audio to play after video if additional views are still available.'
+      },
+      decision_timeout: {
+        type: jsPsych.plugins.parameterType.INT,
+        pretty_name: 'Decision timeout.',
+        default: 0,
+        description: 'Maximum time to decide whether to continue or to watch again. Else, watch again. 0 for no timeout.'
       }
     }
   }
@@ -160,6 +166,7 @@ jsPsych.plugins.video = (function() {
     var audio = new Audio(trial.audio_after);
 
     var views = 0;
+    var listener_backward
     display_element.querySelector('#jspsych-video-player').onended = function(){
       if (views == trial.max_views) {
         end_trial();
@@ -174,18 +181,24 @@ jsPsych.plugins.video = (function() {
           valid_responses: [trial.key_forward],
         });
         listener_backward = jsPsych.pluginAPI.getKeyboardResponse({
-          callback_function: function() {
-            document.getElementById('video-back').style.visibility = 'hidden';
-            // stop the audio file if it is playing
-            audio.pause();
-
-            jsPsych.pluginAPI.cancelKeyboardResponse(listener_backward);
-            display_element.querySelector('#jspsych-video-player').currentTime = 0;
-            display_element.querySelector('#jspsych-video-player').play();
-          },
+          callback_function: replay,
           valid_responses: [trial.key_backward],
         });
+
+        if (trial.decision_timeout > 0) {
+          jsPsych.pluginAPI.setTimeout(replay, trial.decision_timeout);
+        };
       }
+    }
+
+    var replay = function() {
+      document.getElementById('video-back').style.visibility = 'hidden';
+      // stop the audio file if it is playing
+      audio.pause();
+
+      jsPsych.pluginAPI.cancelKeyboardResponse(listener_backward);
+      display_element.querySelector('#jspsych-video-player').currentTime = 0;
+      display_element.querySelector('#jspsych-video-player').play();
     }
 
     // event handler to set timeout to end trial if video is stopped
@@ -210,6 +223,8 @@ jsPsych.plugins.video = (function() {
     var end_trial = function() {
 
       jsPsych.pluginAPI.cancelAllKeyboardResponses()
+      // kill any remaining setTimeout handlers
+      jsPsych.pluginAPI.clearAllTimeouts();
 
       // stop the audio file if it is playing
       audio.pause();

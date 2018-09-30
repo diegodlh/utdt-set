@@ -21,6 +21,7 @@
     	var timeout_instructions = 300
     	var timeout_game = 300
     	var timeout_known = 30
+    	var video_decision_timeout = 30
     	var prewarn = 60
 		var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>'
 
@@ -352,6 +353,7 @@
 			max_views: 2,
 			key_forward: keychars.next,
 			audio_after: 'sounds/after.mp3',
+			decision_timeout: video_decision_timeout*1000,
 			on_load: function() { removeTimeWarning() },
 			data: {}
 		}
