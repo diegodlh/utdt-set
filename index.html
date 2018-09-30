@@ -409,7 +409,7 @@
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), score:score, max_score:max_score, uid:uid, trial_num:trial_num})
 			},
 			choices: [keychars.set, keychars.noset],
-			data: { trial_part: 'cards'},
+			data: { trial_part: 'cards', cards: jsPsych.timelineVariable('cards') },
 			on_finish: function(data) {
 				data.set = jsPsych.timelineVariable('type', true) >= 0
 				if(data.set) {
@@ -427,33 +427,44 @@
 		var explanation = {
 			type: 'html-keyboard-response',
 			stimulus: function() {
-				var response = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].response				
+				var response = jsPsych.data.getLastTrialData().values()[0].response				
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, explain: 'ask',
 					score: score, max_score: max_score, uid:uid, trial_num:trial_num})
 			},
 			choices: [keychars.explain, keychars.noexplain],
-			data: { trial_part: 'decision' },
+			data: {	trial_part: 'decision', cards: jsPsych.timelineVariable('cards') },
+			on_start: function(trial) {
+				trial.data.set = jsPsych.data.getLastTrialData().values()[0].set
+				trial.data.response = jsPsych.data.getLastTrialData().values()[0].response
+				trial.data.correct = jsPsych.data.getLastTrialData().values()[0].correct
+			},
 			on_finish: function(data) {
 				if (data.key_press) {
 					data.explain = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychars.explain)
 				}
-				score = jsPsych.data.get().select('correct').sum()
+				score = jsPsych.data.get().filter({trial_part: 'cards'}).select('correct').sum()
 			}
 		}
 
 		var feedback = {
 			type: 'html-keyboard-response',
 			stimulus: function() {
-				var correct = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].correct
-				var explain = jsPsych.data.get().filter({trial_part: 'decision'}).last(1).values()[0].explain
-				var response = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].response
-				var type = jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].set ? 'set' : 'noset'
+				var correct = jsPsych.data.getLastTrialData().values()[0].correct
+				var explain = jsPsych.data.getLastTrialData().values()[0].explain
+				var response = jsPsych.data.getLastTrialData().values()[0].response
+				var type = jsPsych.data.getLastTrialData().values()[0].set ? 'set' : 'noset'
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, cards_bg: correct ? 'lawngreen' : 'red',
 					explain: explain ? type : 'no', score: score, max_score: max_score, uid:uid, trial_num:trial_num, next:true})
 		    },
 			choices: [keychars.next],
-			data: { trial_part: 'feedback' },
-			on_load: function() {jsPsych.data.get().filter({trial_part: 'cards'}).last(1).values()[0].correct ? audio_correct.play() : audio_wrong.play()}
+			data: { trial_part: 'feedback', cards: jsPsych.timelineVariable('cards')  },
+			on_start: function(trial) {
+				trial.data.set = jsPsych.data.getLastTrialData().values()[0].set
+				trial.data.response = jsPsych.data.getLastTrialData().values()[0].response
+				trial.data.correct = jsPsych.data.getLastTrialData().values()[0].correct
+				trial.data.explain = jsPsych.data.getLastTrialData().values()[0].explain
+			},
+			on_load: function() {jsPsych.data.getLastTrialData().values()[0].correct ? audio_correct.play() : audio_wrong.play()}
 		}
 
 		var test = {
