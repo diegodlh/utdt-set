@@ -16,10 +16,15 @@
     <body></body>
     <script>
 
-    	var tmin_instructions = 180
-    	var timeout_instructions = 600
-    	var timeout_game = 600
+    	var tmin_instructions = 10
+    	var timeout_instructions = 300
+    	var timeout_game = 300
     	var prewarn = 60
+
+    	stimuli[999-1] = stimuli[0]
+    	for (gid=501; gid<=511; gid++) {
+    		stimuli[gid-1] = {"retest": stimuli[0].retest}
+    	}
 
     	function Timer(user_callback, delay, prewarn) {
     		var timerId, start, remaining = (delay-prewarn)*1000;
