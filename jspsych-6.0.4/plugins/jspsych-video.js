@@ -207,21 +207,6 @@ jsPsych.plugins.video = (function() {
       jsPsych.finishTrial(trial_data);
     };
 
-    var after_response = function(info) {
-      if (jsPsych.pluginAPI.compareKeys(info.key, trial.key_backward)) {
-
-        if (current_page !== 0 && trial.allow_backward) {
-          back();
-        }
-      }
-
-      if (jsPsych.pluginAPI.compareKeys(info.key, trial.key_forward)) {
-        next();
-      }
-
-
-    }
-
   };
 
   return plugin;
