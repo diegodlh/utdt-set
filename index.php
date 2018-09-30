@@ -328,7 +328,10 @@
     		type: 'audio-keyboard-response',
     		stimulus: 'sounds/known.mp3',
     		choices: ['s', 'n'],
-    		prompt: '<img src="images/known.png" style="height:75vh"/img>',
+    		prompt: `
+    			<img src="images/known.png" style="height:75vh"/img>
+    			<p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid_string}</p>
+			`,
     		trial_duration: timeout_known*1000,
   			response_ends_trial: true,
   			data: {}
