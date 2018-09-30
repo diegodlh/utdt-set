@@ -20,6 +20,7 @@
     	var timeout_instructions = 300
     	var timeout_game = 300
     	var prewarn = 60
+	var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>'
 
     	stimuli[999-1] = stimuli[0]
     	for (gid=501; gid<=511; gid++) {
@@ -526,9 +527,9 @@
     	}
 
 		jsPsych.init({
-			// todo: record client's ip or hostname (http://net.ipcalf.com/)
 		    timeline: timeline,
 		    on_trial_start: function(trial) {
+			trial.data.client_ip = client_ip;
 		    	trial.data.ts_start = Date.now()
 		    },
 		    on_trial_finish: function(data) {
