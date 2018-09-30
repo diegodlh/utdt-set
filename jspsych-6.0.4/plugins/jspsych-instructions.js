@@ -151,7 +151,7 @@ jsPsych.plugins.instructions = (function() {
           endTrial();
         }
       } else {
-        jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1])})
+        jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1]), "ts_end": Date.now()})
         show_current_page();
       }
 
@@ -163,7 +163,7 @@ jsPsych.plugins.instructions = (function() {
 
       current_page--;
 
-      jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1])})
+      jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1]), "ts_end": Date.now()})
       show_current_page();
     }
 
@@ -194,7 +194,7 @@ jsPsych.plugins.instructions = (function() {
         "rt": (new Date()).getTime() - start_time
       };
 
-      jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1])})
+      jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1]), "ts_end": Date.now()})
       jsPsych.finishTrial(trial_data);
     }
 
