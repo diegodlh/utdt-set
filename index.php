@@ -17,9 +17,9 @@
     <body></body>
     <script>
 
-    	var tmin_instructions = 10
-    	var timeout_instructions = 300
-    	var timeout_game = 300
+    	var tmin_instructions = 100
+    	var timeout_instructions = 600
+    	var timeout_game = 600
     	var timeout_known = 30
     	var video_decision_timeout = 30
     	var prewarn = 60
