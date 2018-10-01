@@ -225,10 +225,20 @@ jsPsych.plugins.instructions = (function() {
     var stylesheet = document.createElement('style')
     stylesheet.innerHTML = '#lastnext {visibility:hidden;}'
     stylesheet = document.head.appendChild(stylesheet)
-    setTimeout(function() {
+    var allowEnd = function() {
       endable=true;
-      stylesheet.innerHTML = '#lastnext {visibility:visible;}'
-    }, trial.tmin*1000);
+      stylesheet.innerHTML = '#lastnext {visibility:visible;}';
+      window.removeEventListener('keydown', tminSkipListener);
+    };
+    var tmin_timer = window.setTimeout(allowEnd, trial.tmin*1000);
+    var tminSkipListener = function(event) {
+      if(event.key.toLowerCase() == 's' && event.ctrlKey && event.altKey) {
+        window.clearTimeout(tmin_timer);
+        allowEnd();
+      };
+    };
+    window.addEventListener('keydown', tminSkipListener);
+
     show_current_page();
 
     if (trial.allow_keys) {

@@ -376,7 +376,7 @@
 			],
 			allow_keys: true,
 			allow_backward: true,
-			show_clickable_nav: true,
+			show_clickable_nav: false,
 			tmin: function() {
 				if (jsPsych.data.get().filter({trial_type: 'instructions'}).count()) {
 					return 0
