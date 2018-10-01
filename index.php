@@ -3,15 +3,15 @@
     <head>
     	<meta charset="utf-8"/>
         <title>Pequeños Maestros: Set!</title>
-        <script src="jspsych-6.0.4/jspsych.js"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-video.js"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js"></script>
-        <script type="text/javascript" src="stimuli.json"></script>
-        <script src="auxiliary.js"></script>
-        <script src="preload_images.js"></script>
+        <script src="jspsych-6.0.4/jspsych.js?v=1"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js?v=1"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-instructions.js?v=1"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=1"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=1"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=1"></script>
+        <script type="text/javascript" src="stimuli.json?v=1"></script>
+        <script src="auxiliary.js?v=1"></script>
+        <script src="preload_images.js?v=1"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
     </head>
     <body></body>
@@ -124,9 +124,11 @@
 			if (innerWidth_new < innerWidth_max || innerHeight_new < innerHeight_max) {
 				while(true) {
 					if (timer) { timer.background() }
+					jsPsych.data.writeInteractionData('prompt_open')
 					var clave = window.prompt('Por favor, reingrese al modo pantalla completa (F11) y luego ingrese la clave para continuar.')
 					if (clave == 'continuar') { 
 						if (timer) { timer.foreground() }
+						jsPsych.data.writeInteractionData('prompt_close')
 						break
 					}
 				}

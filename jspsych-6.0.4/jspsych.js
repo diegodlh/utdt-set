@@ -1318,6 +1318,16 @@ jsPsych.data = (function() {
     return interactionData;
   }
 
+  module.writeInteractionData = function(event_name){
+    var data = {
+      event: event_name,
+      trial: jsPsych.progress().current_trial_global,
+      time: jsPsych.totalTime()
+    };
+    interactionData.push(data);
+    jsPsych.initSettings().on_interaction_data_update(data);
+  };
+
   module.write = function(data_object) {
 
     var progress = jsPsych.progress();
