@@ -7,7 +7,7 @@
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js?v=1"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-instructions.js?v=1"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=1"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=1"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=2"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=1"></script>
         <script type="text/javascript" src="stimuli.json?v=1"></script>
         <script src="auxiliary.js?v=1"></script>
@@ -356,6 +356,7 @@
 			key_forward: keychars.next,
 			audio_after: 'sounds/after.mp3',
 			decision_timeout: video_decision_timeout*1000,
+			disable_menu: true,
 			on_load: function() { removeTimeWarning() },
 			data: {}
 		}

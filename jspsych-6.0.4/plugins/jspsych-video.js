@@ -101,6 +101,12 @@ jsPsych.plugins.video = (function() {
         pretty_name: 'Decision timeout.',
         default: 0,
         description: 'Maximum time to decide whether to continue or to watch again. Else, watch again. 0 for no timeout.'
+      },
+      disable_menu: {
+        type: jsPsych.plugins.parameterType.BOOL,
+        pretty_name: 'Disable context menu.',
+        default: 0,
+        description: 'If true, disable context menu on right click.'
       }
     }
   }
@@ -118,6 +124,9 @@ jsPsych.plugins.video = (function() {
     }
     if(trial.controls){
       video_html +="controls "
+    }
+    if(trial.disable_menu){
+      video_html +='oncontextmenu="return false;"'
     }
     video_html+=">"
     for(var i=0; i<trial.sources.length; i++){
