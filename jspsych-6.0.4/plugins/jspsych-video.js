@@ -175,7 +175,8 @@ jsPsych.plugins.video = (function() {
     var audio = new Audio(trial.audio_after);
 
     var views = 0;
-    var listener_backward
+    var listener_backward;
+    var replay_timer;
     display_element.querySelector('#jspsych-video-player').onended = function(){
       if (views == trial.max_views) {
         end_trial();
@@ -195,7 +196,7 @@ jsPsych.plugins.video = (function() {
         });
 
         if (trial.decision_timeout > 0) {
-          jsPsych.pluginAPI.setTimeout(replay, trial.decision_timeout);
+          replay_timer = jsPsych.pluginAPI.setTimeout(replay, trial.decision_timeout);
         };
       }
     }
@@ -206,6 +207,7 @@ jsPsych.plugins.video = (function() {
       audio.pause();
 
       jsPsych.pluginAPI.cancelKeyboardResponse(listener_backward);
+      window.clearTimeout(replay_timer);
       display_element.querySelector('#jspsych-video-player').currentTime = 0;
       display_element.querySelector('#jspsych-video-player').play();
     }
