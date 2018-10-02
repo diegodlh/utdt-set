@@ -433,6 +433,7 @@
 			choices: [keychars.set, keychars.noset],
 			data: { trial_part: 'cards', cards: jsPsych.timelineVariable('cards') },
 			on_finish: function(data) {
+				data.set_type = jsPsych.timelineVariable('type', true)
 				data.set = jsPsych.timelineVariable('type', true) >= 0
 				if(data.set) {
 					var correct_key = keychars.set
@@ -456,6 +457,7 @@
 			choices: [keychars.explain, keychars.noexplain],
 			data: {	trial_part: 'decision', cards: jsPsych.timelineVariable('cards') },
 			on_start: function(trial) {
+				trial.data.set_type = jsPsych.data.getLastTrialData().values()[0].set_type
 				trial.data.set = jsPsych.data.getLastTrialData().values()[0].set
 				trial.data.response = jsPsych.data.getLastTrialData().values()[0].response
 				trial.data.correct = jsPsych.data.getLastTrialData().values()[0].correct
@@ -481,6 +483,7 @@
 			choices: [keychars.next],
 			data: { trial_part: 'feedback', cards: jsPsych.timelineVariable('cards')  },
 			on_start: function(trial) {
+				trial.data.set_type = jsPsych.data.getLastTrialData().values()[0].set_type
 				trial.data.set = jsPsych.data.getLastTrialData().values()[0].set
 				trial.data.response = jsPsych.data.getLastTrialData().values()[0].response
 				trial.data.correct = jsPsych.data.getLastTrialData().values()[0].correct
