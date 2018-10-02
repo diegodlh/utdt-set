@@ -7,7 +7,7 @@
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js?v=1"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-instructions.js?v=1"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=1"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=2"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=3"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=1"></script>
         <script type="text/javascript" src="stimuli.json?v=1"></script>
         <script src="auxiliary.js?v=1"></script>
@@ -138,9 +138,9 @@
 			window.addEventListener('resize', onresizeFunction)
 		}
 
-		if ( !urlParams.get('ignoreresize') && !mobilecheck() ) {
-			window.addEventListener('resize', onresizeFunction)
-		}
+		// if ( !urlParams.get('ignoreresize') && !mobilecheck() ) {
+		// 	window.addEventListener('resize', onresizeFunction)
+		// }
 
 		var beforeunload = function(event) {
 			saveData()
