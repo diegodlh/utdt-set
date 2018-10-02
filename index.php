@@ -138,9 +138,9 @@
 			window.addEventListener('resize', onresizeFunction)
 		}
 
-		if ( !urlParams.get('ignoreresize') && !mobilecheck() ) {
-			window.addEventListener('resize', onresizeFunction)
-		}
+		// if ( !urlParams.get('ignoreresize') && !mobilecheck() ) {
+		// 	window.addEventListener('resize', onresizeFunction)
+		// }
 
 		var beforeunload = function(event) {
 			saveData()
