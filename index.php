@@ -316,12 +316,18 @@
 					if(event.key.toLowerCase() == 's' && event.ctrlKey && event.altKey) {
 						if (mode != 'test' || video_preloaded) {
 							// if in test mode, hold screen can only be closed if video has been preloaded successfully
-							jsPsych.finishTrial()
+							jsPsych.finishTrial( {'key_press': 'ctrl+alt+s'} )
 							window.removeEventListener('keydown', _listener)
 						} else {
 							window.alert(video + ' not preloaded!')
 						}
 					}
+					var last_trial = jsPsych.data.getLastTrialData().values()[0]
+					if (last_trial && last_trial.trial_type == 'instructions' &&
+						event.key.toLowerCase() == 'r' && event.ctrlKey && event.altKey) {
+						jsPsych.finishTrial( {'key_press': 'ctrl+alt+r'} );
+						window.removeEventListener('keydown', _listener);
+					};
 				});
 			},
 			data: {}
@@ -390,23 +396,36 @@
 
 		var instructions_loop = {
 			// loops over the instructions until a researcher enters the key to proceed
-			timeline: [instructions],
+			timeline: [instructions, hold],
 			loop_function: function() {
-				while(true) {
-					if (timer) { timer.background() }
-					var clave = window.prompt('Ingrese la clave para continuar:')
-					if(clave == 'continuar') {
-						if (timer) {
-							timer.clear()
-							timer = null
-						}
-						removeTimeWarning()
-						return false
-					} else { 
-						if (timer) { timer.foreground() }
-						return true
+				var key_press = jsPsych.data.getLastTrialData().values()[0].key_press
+				if (key_press == 'ctrl+alt+s') {
+					if (timer) {
+						timer.clear()
+						timer = null
 					}
-				}
+					removeTimeWarning()
+					return false
+				} else if (key_press == 'ctrl+alt+r') {
+					return true
+				} else {
+					console.log('unexpected key_press value')
+				};
+				// while(true) {
+				// 	if (timer) { timer.background() }
+				// 	var clave = window.prompt('Ingrese la clave para continuar:')
+				// 	if(clave == 'continuar') {
+				// 		if (timer) {
+				// 			timer.clear()
+				// 			timer = null
+				// 		}
+				// 		removeTimeWarning()
+				// 		return false
+				// 	} else { 
+				// 		if (timer) { timer.foreground() }
+				// 		return true
+				// 	}
+				// }
 			},
 			on_load: function() {
 				if (!timer) {
