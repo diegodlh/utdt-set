@@ -141,16 +141,17 @@ jsPsych.plugins.instructions = (function() {
 
     function next() {
 
-      add_current_page_to_view_history()
-
-      current_page++;
-
       // if done, finish up...
-      if (current_page >= trial.pages.length) {
+      if (current_page + 1 >= trial.pages.length) {
         if (endable) {
+          add_current_page_to_view_history()
+          current_page++;
           endTrial();
         }
       } else {
+        add_current_page_to_view_history()
+        current_page++;
+      
         jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1]), "ts_end": Date.now()})
         show_current_page();
       }
