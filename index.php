@@ -38,8 +38,8 @@
     			div.id = 'timewarning'
     			div.style = 'position:absolute;top:10px;left:50vw;transform:translateX(-50%)'
     			div.innerHTML = `
-    				<span style="background:black;color:red;font-weight:bold;padding:5px">
-    					QUEDA MENOS DE ${Math.ceil(prewarn/60)} MINUTO${Math.ceil(prewarn/60)>1 ? 'S' : ''}
+    				<span style="background:#222;color:red;font-weight:bold;padding:5px;border-radius:5px">
+    					QUEDA${Math.ceil(prewarn/60)>1 ? 'N' : ''} MENOS DE ${Math.ceil(prewarn/60)} MINUTO${Math.ceil(prewarn/60)>1 ? 'S' : ''}
 					</span>
     				`;
     			document.body.appendChild(div)
@@ -317,12 +317,18 @@
 					if(event.key.toLowerCase() == 's' && event.ctrlKey && event.altKey) {
 						if (mode != 'test' || video_preloaded) {
 							// if in test mode, hold screen can only be closed if video has been preloaded successfully
-							jsPsych.finishTrial()
+							jsPsych.finishTrial( {'key_press': 'ctrl+alt+s'} )
 							window.removeEventListener('keydown', _listener)
 						} else {
 							window.alert(video + ' not preloaded!')
 						}
 					}
+					var last_trial = jsPsych.data.getLastTrialData().values()[0]
+					if (last_trial && last_trial.trial_type == 'instructions' &&
+						event.key.toLowerCase() == 'r' && event.ctrlKey && event.altKey) {
+						jsPsych.finishTrial( {'key_press': 'ctrl+alt+r'} );
+						window.removeEventListener('keydown', _listener);
+					};
 				});
 			},
 			data: {}
@@ -394,23 +400,36 @@
 
 		var instructions_loop = {
 			// loops over the instructions until a researcher enters the key to proceed
-			timeline: [instructions],
+			timeline: [instructions, hold],
 			loop_function: function() {
-				while(true) {
-					if (timer) { timer.background() }
-					var clave = window.prompt('Ingrese la clave para continuar:')
-					if(clave == 'continuar') {
-						if (timer) {
-							timer.clear()
-							timer = null
-						}
-						removeTimeWarning()
-						return false
-					} else { 
-						if (timer) { timer.foreground() }
-						return true
+				var key_press = jsPsych.data.getLastTrialData().values()[0].key_press
+				if (key_press == 'ctrl+alt+s') {
+					if (timer) {
+						timer.clear()
+						timer = null
 					}
-				}
+					removeTimeWarning()
+					return false
+				} else if (key_press == 'ctrl+alt+r') {
+					return true
+				} else {
+					console.log('unexpected key_press value')
+				};
+				// while(true) {
+				// 	if (timer) { timer.background() }
+				// 	var clave = window.prompt('Ingrese la clave para continuar:')
+				// 	if(clave == 'continuar') {
+				// 		if (timer) {
+				// 			timer.clear()
+				// 			timer = null
+				// 		}
+				// 		removeTimeWarning()
+				// 		return false
+				// 	} else { 
+				// 		if (timer) { timer.foreground() }
+				// 		return true
+				// 	}
+				// }
 			},
 			on_load: function() {
 				if (!timer) {
