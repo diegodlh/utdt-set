@@ -10,7 +10,7 @@
         <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=3"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=1"></script>
         <script type="text/javascript" src="stimuli.json?v=1"></script>
-        <script src="auxiliary.js?v=1"></script>
+        <script src="auxiliary.js?v=2"></script>
         <script src="preload_images.js?v=1"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
     </head>
