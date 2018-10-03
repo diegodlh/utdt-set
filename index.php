@@ -38,8 +38,8 @@
     			div.id = 'timewarning'
     			div.style = 'position:absolute;top:10px;left:50vw;transform:translateX(-50%)'
     			div.innerHTML = `
-    				<span style="background:black;color:red;font-weight:bold;padding:5px">
-    					QUEDA MENOS DE ${Math.ceil(prewarn/60)} MINUTO${Math.ceil(prewarn/60)>1 ? 'S' : ''}
+    				<span style="background:#222;color:red;font-weight:bold;padding:5px;border-radius:5px">
+    					QUEDA${Math.ceil(prewarn/60)>1 ? 'N' : ''} MENOS DE ${Math.ceil(prewarn/60)} MINUTO${Math.ceil(prewarn/60)>1 ? 'S' : ''}
 					</span>
     				`;
     			document.body.appendChild(div)
