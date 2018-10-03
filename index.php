@@ -14,13 +14,13 @@
         <script src="preload_images.js?v=1"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
     </head>
-    <body></body>
+    <body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;" style="cursor:none"></body>
     <script>
 
     	var tmin_instructions = 100
     	var timeout_instructions = 600
     	var timeout_game = 600
-    	var timeout_known = 30
+    	var timeout_known = 60
     	var video_decision_timeout = 30
     	var prewarn = 60
 		var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>'
@@ -199,7 +199,8 @@
 		}
 
 		var keydown = function(keychar) {
-			if (window.mobilecheck()) {
+			// if (window.mobilecheck()) {
+			if (true) {
 				var e = new Event("keydown")
 				e.keyCode=jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychar)
 				document.body.dispatchEvent(e)
@@ -332,8 +333,11 @@
     		stimulus: 'sounds/known.mp3',
     		choices: ['s', 'n'],
     		prompt: `
-    			<img src="images/known.png" style="height:75vh"/img>
-    			<p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid_string}</p>
+    			<div style="width:100vw;height:100vh;display:table-cell;vertical-align:middle;cursor:auto">
+	    			<img src="images/known.png" style="height:25vh" /img><br>
+	    			<img src="images/s_key.png" onclick=keydown("s") style="height:25vh;margin:5%" /><img src="images/n_key.png" onclick=keydown("n") style="height:25vh;margin:5%" />
+	    			<p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid_string}</p>
+    			</div>
 			`,
     		trial_duration: timeout_known*1000,
   			response_ends_trial: true,
@@ -356,7 +360,7 @@
 			key_forward: keychars.next,
 			audio_after: 'sounds/after.mp3',
 			decision_timeout: video_decision_timeout*1000,
-			disable_menu: true,
+			// disable_menu: true,
 			on_load: function() { removeTimeWarning() },
 			data: {}
 		}
@@ -550,7 +554,7 @@
     	if (mode == 'retest') {
     		preload.push(preload_instructions)
     	}
-    	preload.push('images/known.png')
+    	preload.push('images/known.png', 'images/s_key.png', 'images/n_key.png')
 
 		jsPsych.init({
 		    timeline: timeline,

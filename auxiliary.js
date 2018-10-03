@@ -19,8 +19,8 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
     var explain_html = ''
     if(explain=='ask') {
     	explain_html = `
-            <img src="images/help.png" onclick=keydown("${keychars.explain}") style="height:25vh;margin:5vw"/>
-            <img src="images/nohelp.png" onclick=keydown("${keychars.noexplain}") style="height:25vh;margin:5vw"/>`
+            <img src="images/help.png" _onclick=keydown("${keychars.explain}") style="height:25vh;margin:5vw"/>
+            <img src="images/nohelp.png" _onclick=keydown("${keychars.noexplain}") style="height:25vh;margin:5vw"/>`
     } else if(explain=='no') {
     	explain_html = `
             <img src="images/help.png" style="height:25vh;margin:5vw;visibility:hidden"/>
@@ -46,8 +46,8 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
                                 ${cardsHTML(cards)}
                             </td>
                             <td style="width:${(1-cards_width)/2*100}%">
-                                <img src="images/set.png" onclick=keydown("${keychars.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/><br>
-                                <img src="images/noset.png" onclick=keydown("${keychars.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
+                                <img src="images/set.png" _onclick=keydown("${keychars.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/><br>
+                                <img src="images/noset.png" _onclick=keydown("${keychars.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
                             </td>
                         </tr>
                     </table>
@@ -60,7 +60,7 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
             	</td>
             </tr>
         </table>
-        ${next ? `<img src="images/next.png" onclick=keydown("${keychars.next}") style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:10%" />` : ''}
+        ${next ? `<img src="images/next.png" _onclick=keydown("${keychars.next}") style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:10%" />` : ''}
     </div>
         `;
     return html
@@ -160,8 +160,8 @@ var makeInstruction = function({sideA, sideB='', isfirst=false, islast=false, ui
     var html = `
         <div style="width:100vw;height:100vh;position:relative;display:table-cell;vertical-align:middle">
             <img src="${sideA}" style="width:${80*2/3}vw;opacity:${sideB ? .5 : 1}" /><img src="${sideB}" style="width:${80*1/3}vw" />
-            <img src="${!isfirst ? 'instructions/leftkey.png' : ''}" onclick=keydown("leftarrow") style="position:absolute;left:0;bottom:0">
-            <img id="${islast ? 'lastnext' : ''}" src="instructions/rightkey.png" onclick=keydown("rightarrow") style="position:absolute;right:0;bottom:0">
+            <img src="${!isfirst ? 'instructions/leftkey.png' : ''}" _onclick=keydown("leftarrow") style="position:absolute;left:0;bottom:0">
+            <img id="${islast ? 'lastnext' : ''}" src="instructions/rightkey.png" _onclick=keydown("rightarrow") style="position:absolute;right:0;bottom:0">
             <p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid}</p>
         <div>
         `;
