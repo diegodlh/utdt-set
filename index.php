@@ -165,7 +165,6 @@
 				var xhr = new XMLHttpRequest();
 				while(true) {
 					xhr.open('POST', 'write_audio.php', false);
-					xhr.setRequestHeader('Content-Type', 'multipart/form-data');
 					try {
 						xhr.send(formData);
 					} catch(error) {
@@ -176,7 +175,7 @@
 						break
 					} else {
 						if (!window.confirm(filename + ' could not be saved to server. Try again?')) {
-							audio.download()
+							audio.download(filename)
 							break
 						}
 					}
