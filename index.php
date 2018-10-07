@@ -9,6 +9,7 @@
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=1"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=3"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=1"></script>
+        <script src="recordAudio.js"></script>
         <script type="text/javascript" src="stimuli.json?v=1"></script>
         <script src="auxiliary.js?v=1"></script>
         <script src="preload_images.js?v=1"></script>
@@ -157,6 +158,31 @@
 
 			// }
 
+			function saveRecording(filename, audio) {
+				var formData = new FormData();
+				formData.append('filename', filename);
+				formData.append('blob', audio.audioBlob)
+				var xhr = new XMLHttpRequest();
+				while(true) {
+					xhr.open('POST', 'write_audio.php', false);
+					xhr.setRequestHeader('Content-Type', 'multipart/form-data');
+					try {
+						xhr.send(formData);
+					} catch(error) {
+						console.log(error)
+					}
+					if(xhr.status == 200) {
+						console.log(filename + ' successfully saved to server.')
+						break
+					} else {
+						if (!window.confirm(filename + ' could not be saved to server. Try again?')) {
+							audio.download()
+							break
+						}
+					}
+				};
+			};
+
 			function saveRemote(filename, csvdata) {
 				var xhr = new XMLHttpRequest();
 				while(true) {
@@ -196,7 +222,11 @@
 			// saveLocal()
 			saveRemote('data_' + basename, jsPsych.data.get().ignore('stimulus').csv())
 			saveRemote('intdata_' + basename, jsPsych.data.getInteractionData().csv())
-		}
+
+			if (recorded) {
+				recorded.then(audio => saveRecording('audio_' + basename, audio))
+			};
+		};
 
 		var keydown = function(keychar) {
 			if (window.mobilecheck()) {
@@ -215,7 +245,8 @@
 						timer.clear();
 						timer = null;
 					};
-					removeTimeWarning()
+					removeTimeWarning();
+					if (audio_recorder && !recorded) { recorded = audio_recorder.stop() };
 					jsPsych.endCurrentTimeline()  // exits instructions loop to avoid confirmation prompt
 					jsPsych.pauseExperiment()  // prevent next trial from loading after finishing current trial
 					jsPsych.finishTrial()
@@ -244,13 +275,20 @@
     		var uid = window.prompt('uid:', '')    		
 		}
 
-		modes = ['test', 'retest']
-		var mode = urlParams.get('mode')    	
+		var modes = ['test', 'retest']
+		var mode = urlParams.get('mode')
+		var record = false;  // do not record audio by default
+		var recorded
 		while (true) {
 			if (mode) {
 				if (mode in stimuli[uid-1]) { break }
 			}
-			var mode = modes[window.prompt('1 (test) / 2 (retest):', '') - 1]
+			let mode_choice = window.prompt('1 (test) / 2 (retest) / 3 (retest w/ mic):', '');
+			if (mode_choice == 3) {
+				record = true;
+				mode_choice = 2;
+			};
+			mode = modes[mode_choice - 1];
 		}
 
 		// only if mode is test, preloads the video file
@@ -404,7 +442,8 @@
 						timer.clear()
 						timer = null
 					}
-					removeTimeWarning()
+					removeTimeWarning();
+					if (audio_recorder && !recorded) { recorded = audio_recorder.stop() };
 					return false
 				} else if (key_press == 'ctrl+alt+r') {
 					return true
@@ -431,7 +470,8 @@
 				if (!timer) {
 					timer = new Timer(function() {
 						timer = null
-						removeTimeWarning()
+						removeTimeWarning();
+						if (audio_recorder && !recorded) { recorded = audio_recorder.stop() };
 						jsPsych.endCurrentTimeline()
 						jsPsych.finishTrial()
 						while(true) {
@@ -439,9 +479,10 @@
 							if (clave == 'continuar') { break }
 						}
 					}, timeout_instructions, prewarn)
-				}
+				};
+				if (audio_recorder) { audio_recorder.start() };
 			}
-		}
+		};
 
 		var cards = {
 			type: 'html-keyboard-response',
@@ -569,8 +610,11 @@
     	if (mode == 'retest') {
     		preload.push(preload_instructions)
     	}
-    	preload.push('images/known.png')
+    	preload.push('images/known.png');
 
+    	var audio_recorder
+    	(async () => { audio_recorder = await recordAudio(record) })();
+		
 		jsPsych.init({
 		    timeline: timeline,
 		    on_trial_start: function(trial) {
