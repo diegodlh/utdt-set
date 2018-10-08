@@ -26,9 +26,11 @@
     	var prewarn = 60
 		var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>'
 
-    	stimuli[999-1] = stimuli[0]
     	for (gid=501; gid<=511; gid++) {
     		stimuli[gid-1] = {"retest": stimuli[0].retest}
+    	}
+    	for (mock_id=900; mock_id<=999; mock_id++) {
+    		stimuli[mock_id-1] = stimuli[0];
     	}
 
     	function Timer(user_callback, delay, prewarn) {
