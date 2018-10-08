@@ -81,13 +81,13 @@ jsPsych.plugins.video = (function() {
       key_forward: {
         type: jsPsych.plugins.parameterType.KEYCODE,
         pretty_name: 'Key forward',
-        default: 'rightarrow',
+        default: 'ArrowRight',
         description: 'The key the subject can press in order to end the trial.'
       },
       key_backward: {
         type: jsPsych.plugins.parameterType.KEYCODE,
         pretty_name: 'Key backward',
-        default: 'leftarrow',
+        default: 'ArrowLeft',
         description: 'The key that the subject can press to play the video again.'
       },
       audio_after: {

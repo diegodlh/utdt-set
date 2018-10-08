@@ -3,15 +3,15 @@
     <head>
     	<meta charset="utf-8"/>
         <title>Pequeños Maestros: Set!</title>
-        <script src="jspsych-6.0.4/jspsych.js?v=1"></script>
+        <script src="jspsych-6.0.4/jspsych.js?v=2"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js?v=1"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-instructions.js?v=2"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-instructions.js?v=3"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=1"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=3"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=4"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=1"></script>
         <script src="recordAudio.js?v=2"></script>
         <script type="text/javascript" src="stimuli.json?v=1"></script>
-        <script src="auxiliary.js?v=2"></script>
+        <script src="auxiliary.js?v=3"></script>
         <script src="preload_images.js?v=1"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
     </head>
@@ -227,14 +227,14 @@
 			};
 		};
 
-		var keydown = function(keychar) {
+		var keydown = function(keystring) {
 			// if (window.mobilecheck()) {
 			if (true) {
 				var e = new Event("keydown")
-				e.keyCode=jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychar)
+				e.code=keystring
 				document.body.dispatchEvent(e)
 				var e = new Event("keyup")
-				e.keyCode=jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychar)
+				e.code=keystring
 				document.body.dispatchEvent(e)
 			}
 		}
@@ -374,11 +374,11 @@
 		var known_trial = {
     		type: 'audio-keyboard-response',
     		stimulus: 'sounds/known.mp3',
-    		choices: ['s', 'n'],
+    		choices: ['KeyS', 'KeyN'],
     		prompt: `
     			<div style="width:100vw;height:100vh;display:table-cell;vertical-align:middle;cursor:auto">
 	    			<img src="images/known.png" style="height:25vh" /img><br>
-	    			<img src="images/s_key.png" onclick=keydown("s") style="height:25vh;margin:5%" /><img src="images/n_key.png" onclick=keydown("n") style="height:25vh;margin:5%" />
+	    			<img src="images/s_key.png" onclick=keydown("KeyS") style="height:25vh;margin:5%" /><img src="images/n_key.png" onclick=keydown("KeyN") style="height:25vh;margin:5%" />
 	    			<p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid_string}</p>
     			</div>
 			`,
@@ -400,7 +400,7 @@
 			controls: false,
 			uid: uid_string,
 			max_views: 2,
-			key_forward: keychars.next,
+			key_forward: keystrings.next,
 			audio_after: 'sounds/after.mp3',
 			decision_timeout: video_decision_timeout*1000,
 			// disable_menu: true,
@@ -493,19 +493,19 @@
 				trial_num += 1
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), score:score, max_score:max_score, uid:uid, trial_num:trial_num})
 			},
-			choices: [keychars.set, keychars.noset],
+			choices: [keystrings.set, keystrings.noset],
 			data: { trial_part: 'cards', cards: jsPsych.timelineVariable('cards') },
 			on_finish: function(data) {
 				data.set_type = jsPsych.timelineVariable('type', true)
 				data.set = jsPsych.timelineVariable('type', true) >= 0
 				if(data.set) {
-					var correct_key = keychars.set
+					var correct_key = keystrings.set
 				} else {
-					var correct_key = keychars.noset
+					var correct_key = keystrings.noset
 				}
 				if (data.key_press) {
-					data.response = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychars.set) ? 'set' : 'noset'
-					data.correct = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(correct_key);
+					data.response = data.key_press == keystrings.set ? 'set' : 'noset'
+					data.correct = data.key_press == correct_key;
 				}
 			}
 		}
@@ -517,7 +517,7 @@
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, explain: 'ask',
 					score: score, max_score: max_score, uid:uid, trial_num:trial_num})
 			},
-			choices: [keychars.explain, keychars.noexplain],
+			choices: [keystrings.explain, keystrings.noexplain],
 			data: {	trial_part: 'decision', cards: jsPsych.timelineVariable('cards') },
 			on_start: function(trial) {
 				trial.data.set_type = jsPsych.data.getLastTrialData().values()[0].set_type
@@ -527,7 +527,7 @@
 			},
 			on_finish: function(data) {
 				if (data.key_press) {
-					data.explain = data.key_press == jsPsych.pluginAPI.convertKeyCharacterToKeyCode(keychars.explain)
+					data.explain = data.key_press == keystrings.explain
 				}
 				score = jsPsych.data.get().filter({trial_part: 'cards'}).select('correct').sum()
 			}
@@ -543,7 +543,7 @@
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, cards_bg: correct ? 'lawngreen' : 'red',
 					explain: explain ? type : 'no', score: score, max_score: max_score, uid:uid, trial_num:trial_num, next:true})
 		    },
-			choices: [keychars.next],
+			choices: [keystrings.next],
 			data: { trial_part: 'feedback', cards: jsPsych.timelineVariable('cards')  },
 			on_start: function(trial) {
 				trial.data.set_type = jsPsych.data.getLastTrialData().values()[0].set_type

@@ -1,9 +1,9 @@
-var keychars = {
-    set: '8numpad',
-    noset: '2numpad',
-    explain: '4numpad',
-    noexplain: '6numpad',
-    next: '5numpad'
+var keystrings = {
+    set: 'Numpad8',
+    noset: 'Numpad2',
+    explain: 'Numpad4',
+    noexplain: 'Numpad6',
+    next: 'Numpad5'
 }
 
 var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=0, max_score, uid, trial_num, next=false} = {}) {
@@ -19,8 +19,8 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
     var explain_html = ''
     if(explain=='ask') {
     	explain_html = `
-            <img src="images/help.png" _onclick=keydown("${keychars.explain}") style="height:25vh;margin:5vw"/>
-            <img src="images/nohelp.png" _onclick=keydown("${keychars.noexplain}") style="height:25vh;margin:5vw"/>`
+            <img src="images/help.png" _onclick=keydown("${keystrings.explain}") style="height:25vh;margin:5vw"/>
+            <img src="images/nohelp.png" _onclick=keydown("${keystrings.noexplain}") style="height:25vh;margin:5vw"/>`
     } else if(explain=='no') {
     	explain_html = `
             <img src="images/help.png" style="height:25vh;margin:5vw;visibility:hidden"/>
@@ -46,8 +46,8 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
                                 ${cardsHTML(cards)}
                             </td>
                             <td style="width:${(1-cards_width)/2*100}%">
-                                <img src="images/set.png" _onclick=keydown("${keychars.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/><br>
-                                <img src="images/noset.png" _onclick=keydown("${keychars.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
+                                <img src="images/set.png" _onclick=keydown("${keystrings.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/><br>
+                                <img src="images/noset.png" _onclick=keydown("${keystrings.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
                             </td>
                         </tr>
                     </table>
@@ -60,7 +60,7 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
             	</td>
             </tr>
         </table>
-        ${next ? `<img src="images/next.png" _onclick=keydown("${keychars.next}") style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:10%" />` : ''}
+        ${next ? `<img src="images/next.png" _onclick=keydown("${keystrings.next}") style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:10%" />` : ''}
     </div>
         `;
     return html

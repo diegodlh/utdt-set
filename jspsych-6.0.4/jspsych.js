@@ -1864,10 +1864,10 @@ jsPsych.pluginAPI = (function() {
     for(var i=0; i<keyboard_listeners.length; i++){
       keyboard_listeners[i].fn(e);
     }
-    held_keys[e.keyCode] = true;
+    held_keys[e.code] = true;
   }
   var root_keyup_listener = function(e){
-    held_keys[e.keyCode] = false;
+    held_keys[e.code] = false;
   }
 
   module.reset = function(root_element){
@@ -1919,16 +1919,17 @@ jsPsych.pluginAPI = (function() {
       } else {
         if(parameters.valid_responses != jsPsych.NO_KEYS){
           for (var i = 0; i < parameters.valid_responses.length; i++) {
-            if (typeof parameters.valid_responses[i] == 'string') {
-              var kc = jsPsych.pluginAPI.convertKeyCharacterToKeyCode(parameters.valid_responses[i]);
-              if (typeof kc !== 'undefined') {
-                if (e.keyCode == kc) {
-                  valid_response = true;
-                }
-              } else {
-                throw new Error('Invalid key string specified for getKeyboardResponse');
-              }
-            } else if (e.keyCode == parameters.valid_responses[i]) {
+            // if (typeof parameters.valid_responses[i] == 'string') {
+            //   var kc = jsPsych.pluginAPI.convertKeyCharacterToKeyCode(parameters.valid_responses[i]);
+            //   if (typeof kc !== 'undefined') {
+            //     if (e.keyCode == kc) {
+            //       valid_response = true;
+            //     }
+            //   } else {
+            //     throw new Error('Invalid key string specified for getKeyboardResponse');
+            //   }
+            // } else if (e.keyCode == parameters.valid_responses[i]) {
+            if (e.code == parameters.valid_responses[i]) {
               valid_response = true;
             }
           }
@@ -1937,7 +1938,7 @@ jsPsych.pluginAPI = (function() {
       // check if key was already held down
 
       if (((typeof parameters.allow_held_key == 'undefined') || !parameters.allow_held_key) && valid_response) {
-        if (typeof held_keys[e.keyCode] !== 'undefined' && held_keys[e.keyCode] == true) {
+        if (typeof held_keys[e.code] !== 'undefined' && held_keys[e.code] == true) {
           valid_response = false;
         }
       }
@@ -1945,7 +1946,7 @@ jsPsych.pluginAPI = (function() {
       if (valid_response) {
 
         parameters.callback_function({
-          key: e.keyCode,
+          key: e.code,
           rt: key_time - start_time
         });
 
@@ -2003,12 +2004,12 @@ jsPsych.pluginAPI = (function() {
 
   module.compareKeys = function(key1, key2){
     // convert to numeric values no matter what
-    if(typeof key1 == 'string') {
-      key1 = module.convertKeyCharacterToKeyCode(key1);
-    }
-    if(typeof key2 == 'string') {
-      key2 = module.convertKeyCharacterToKeyCode(key2);
-    }
+    // if(typeof key1 == 'string') {
+    //   key1 = module.convertKeyCharacterToKeyCode(key1);
+    // }
+    // if(typeof key2 == 'string') {
+    //   key2 = module.convertKeyCharacterToKeyCode(key2);
+    // }
     return key1 == key2;
   }
 
