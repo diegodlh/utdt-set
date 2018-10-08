@@ -9,7 +9,7 @@
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=1"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=3"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=1"></script>
-        <script src="recordAudio.js"></script>
+        <script src="recordAudio.js?v=2"></script>
         <script type="text/javascript" src="stimuli.json?v=1"></script>
         <script src="auxiliary.js?v=2"></script>
         <script src="preload_images.js?v=1"></script>
@@ -223,7 +223,7 @@
 			saveRemote('intdata_' + basename, jsPsych.data.getInteractionData().csv())
 
 			if (recorded) {
-				recorded.then(audio => saveRecording('audio_' + basename, audio))
+				recorded.then(audio => saveRecording('audio_' + basename + '.webm', audio))
 			};
 		};
 
@@ -474,13 +474,13 @@
 					timer = new Timer(function() {
 						timer = null
 						removeTimeWarning();
-						if (audio_recorder && !recorded) { recorded = audio_recorder.stop() };
 						jsPsych.endCurrentTimeline()
 						jsPsych.finishTrial()
 						while(true) {
 							var clave = window.prompt('El tiempo se agotó. Ingrese la clave para continuar:')
 							if (clave == 'continuar') { break }
-						}
+						};
+						if (audio_recorder && !recorded) { recorded = audio_recorder.stop() };
 					}, timeout_instructions, prewarn)
 				};
 				if (audio_recorder) { audio_recorder.start() };
@@ -616,7 +616,9 @@
     	preload.push('images/known.png', 'images/s_key.png', 'images/n_key.png')
 
     	var audio_recorder
-    	(async () => { audio_recorder = await recordAudio(record) })();
+    	(async () => {
+    		audio_recorder = await recordAudio(record).catch(err => {console.log(err)})  // if promised rejected, catch
+		})();
 		
 		jsPsych.init({
 		    timeline: timeline,

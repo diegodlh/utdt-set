@@ -29,10 +29,10 @@ const recordAudio = record => {  // this is a function with promise functionalit
           mediaRecorder.addEventListener("stop", () => {  // not sure why this was set as a listener
             const audioBlob = new Blob(audioChunks);  // , { 'type' : '' });
             const audioUrl = URL.createObjectURL(audioBlob);
-            const audio = new Audio(audioUrl);
-            const play = () => {
-              audio.play();
-            };
+            // const audio = new Audio(audioUrl);
+            // const play = () => {
+            //   audio.play();
+            // };
             const download = (filename) => {
               var a = document.createElement('a');
               a.href = audioUrl;
@@ -42,7 +42,7 @@ const recordAudio = record => {  // this is a function with promise functionalit
               document.body.removeChild(a);
             };
 
-            resolve({ audioBlob, audioUrl, play, download });  // promise fullfilled, resolution value
+            resolve({ audioBlob, audioUrl, download });  // promise fullfilled, resolution value
           });
 
           if (mediaRecorder.state != 'inactive') {
@@ -57,6 +57,7 @@ const recordAudio = record => {  // this is a function with promise functionalit
         resolve({ start, stop });  // resolution value of promise returned by recordAudio
       } else {
         stop();
+        reject('Recording authorized, but not requested.');
       }
     };
 
@@ -73,15 +74,10 @@ const recordAudio = record => {  // this is a function with promise functionalit
       .then(onSuccess)  // this is the function called if the getUserMedia promise is fullfilled; it is called with the *stream* argument, which is the fullfillment value of the getUserMedia promise
 
       // Error callback
-      .catch(onError)  // test: will it fail here if mic not available?
+      .catch(onError)
     } else {
       console.log('getUserMedia not supported on your browser!');
       reject('getUserMedia not supported on your browser!');  // rejected, failure reason of promise returned by recordAudio
     };
   });
 };
-
-// tengo que hacer getusermedia al principio, incluso en test, para autorizar al comienzo
-// puedo abrir y cerrar
-// qué pasa si no hay mic disponible? tengo que tenerlo en cuenta
-// voy a grabar en todos los repasos? quizá podría agregar opc al prompt: enseñanza
