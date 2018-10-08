@@ -427,6 +427,8 @@
 				makeInstruction({sideA: 'instructions/fin.png', uid: uid_string, islast: true})
 			],
 			allow_keys: true,
+			key_forward: uid >= 500 && uid < 600 ? 'PageDown' : null,
+			key_backward: uid >= 500 && uid < 600 ? 'PageUp' : null,
 			allow_backward: true,
 			show_clickable_nav: false,
 			tmin: function() {
