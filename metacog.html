@@ -26,10 +26,10 @@
     var consecutive_losses=0;
     var step_index=-1;
     var step=[];
-    var max_levels=50;
+    var max_levels=100;
     var score = 0;
     var timer;
-    var timeout=5*1000;
+    var timeout=5*60*1000;
 
     var saveData = function() {
 
@@ -84,6 +84,7 @@
       ],
       allow_keys: false,
       allow_backward: true,
+      show_page_number: true,
       show_clickable_nav: true,
       button_label_previous: 'VOLVER',
       button_label_next: 'SEGUIR',
@@ -209,7 +210,7 @@
       stimulus: function() {
         var html = `
           <div style="position:relative;background-color:#00aa00;height:100vh;width:100vw;display:table-cell;vertical-align:middle">
-            <p style="font-size:10vw;margin:0;color:#cc9900">
+            <p style="font-size:5vw;margin:0;color:#cc9900">
               ¡GANASTE${score > 0 ? ' ' + score + ' PUNTO' : ''}${score > 1 ? 'S' : ''}!
             </p>
           `;
