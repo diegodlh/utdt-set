@@ -66,10 +66,11 @@ jsPsych.plugins["circles"] = (function() {
 
   var trial_data={
     won:[],
-    rt:[]
+    rt:[],
+    level: []
   };
 
-
+  trial_data.level=trial.level;
   display_element.innerHTML="<p id='text'></p><canvas width="+canvas_size[0]+ "px height="+canvas_size[1]+"px id='myCanvas' style=' margin-left:0px auto;  cursor:crosshair; ' ;></canvas>";
   var canvas = document.getElementById('myCanvas'),
       canvas_rect = canvas.getBoundingClientRect(),
