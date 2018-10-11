@@ -596,6 +596,7 @@
 				removeTimeWarning()
 				audio_win.play()
 				setTimeout(saveData, 100)
+				window.removeEventListener('keydown', endExperiment);
 				window.removeEventListener('resize', onresizeFunction)
 				window.removeEventListener('beforeunload', beforeunload)
 			},
