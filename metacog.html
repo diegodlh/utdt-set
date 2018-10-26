@@ -30,7 +30,7 @@
     var step_index=-1;
     var step=[];
     var max_levels=100;
-    var score = 0;
+    var pass_count=0;
     var timer;
     var timeout=5*60*1000;
 
@@ -179,9 +179,6 @@
           points=points%points_to_pass;
         }
         return points;
-      },
-      on_finish: function() {
-        score += jsPsych.data.getLastTrialData().select("trial_score").values[0]
       }
     };
 
@@ -191,6 +188,9 @@
         var results = jsPsych.data.get().select("accum_score").values;
         accum_score= results[results.length-1];
         if((accum_score>=points_to_pass)||trial_index>=max_levels){
+          if (accum_score>=points_to_pass) {
+            pass_count++;
+          };
           return false;
         } else{
           return true;
@@ -229,6 +229,7 @@
     var winner = {
       type: 'html-keyboard-response',
       stimulus: function() {
+        var score = pass_count * points_to_pass + jsPsych.data.get().select("accum_score").values.slice(-1)[0] % points_to_pass
         var html = `
           <div style="position:relative;background-color:#00aa00;height:100vh;width:100vw;display:table-cell;vertical-align:middle">
             <p style="font-size:5vw;margin:0;color:#cc9900">
