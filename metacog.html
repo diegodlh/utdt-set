@@ -76,6 +76,24 @@
 
     };
 
+    var standby = {
+      type: 'html-keyboard-response',
+      stimulus: `
+        <p style="background-color:#AAA;height:100vh;width:100vw;font-size:75vh;margin:0;display:table-cell;vertical-align:middle">
+          ${uid.toString().padStart(3, '0')}
+        </p>
+        `,
+      choices: jsPsych.NO_KEYS,
+      on_load: function() {
+        window.addEventListener('keydown', function _listener(event) {
+          if(event.key.toLowerCase() == 's' && event.ctrlKey && event.altKey) {
+            jsPsych.finishTrial( {'key_press': 'ctrl+alt+s'} )
+            window.removeEventListener('keydown', _listener)
+          };
+        });
+      }
+    };
+
     var intro = {
       type: 'instructions',
       pages: [
@@ -244,7 +262,7 @@
     window.addEventListener('keydown', endExperiment)
 
     jsPsych.init({
-      timeline: [intro, big_if_node, winner],
+      timeline: [standby, intro, big_if_node, winner],
       // on_finish: function() {
       //   jsPsych.data.displayData();
       // },
