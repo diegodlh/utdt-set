@@ -217,14 +217,16 @@
       },
       on_load: function() {
         if (!timer) {
-          timer = jsPsych.pluginAPI.setTimeout(function() {
-            trial_index=max_levels;
-            jsPsych.endCurrentTimeline();
-            jsPsych.finishTrial();
-          }, timeout);
+          timer = jsPsych.pluginAPI.setTimeout(timeUp, timeout);
         }
       }
     }
+
+    var timeUp = function() {
+      trial_index=max_levels;
+      jsPsych.endCurrentTimeline();
+      jsPsych.finishTrial();
+    };
 
     var winner = {
       type: 'html-keyboard-response',
