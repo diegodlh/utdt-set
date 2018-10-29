@@ -21,7 +21,7 @@
 
     var points_to_pass=10;
     var stepSizes=[0.1,0.05,0.05,0.01];
-    var level=0.3;
+    var level=0.3; // initiate level difficulty
     var nUp=1;
     var nDown=3;
     var trial_index=0;
@@ -131,7 +131,7 @@
             } else{
               var results = jsPsych.data.get().select("won").values;
               var last_trial_won=results[results.length-1];
-              if ((last_trial_won && consecutive_wins ==1)|| (!last_trial_won && consecutive_losses==1) ){ // reversal
+              if ((last_trial_won && consecutive_wins ==1) || (!last_trial_won && consecutive_losses==1) ){ // reversal
                 step_index++;
                 step=stepSizes[Math.min(step_index,stepSizes.length-1)];
               };
@@ -141,14 +141,16 @@
                 }else{
                   level=Math.max(0,level+step);
                 }
+              } else {
+                if(last_trial_won && ( (consecutive_wins==nDown ) ) ){
+                    level=Math.max(0,level-step);
+                    consecutive_wins=0;
+                }else if (!last_trial_won && ( (consecutive_losses==nUp) ) ) {
+                  level=Math.min(1,level+step);
+                  consecutive_losses=0;
+                }
               }
-              if(last_trial_won && ( (consecutive_wins==nDown ) ) ){
-                  level=Math.max(0,level-step);
-                  consecutive_wins=0;
-              }else if (!last_trial_won && ( (consecutive_losses==nUp) ) ) {
-                level=Math.min(1,level+step);
-                consecutive_losses=0;
-              }
+              //console.log(level)
               return level;
             }
         },
