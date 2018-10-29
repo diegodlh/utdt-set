@@ -31,7 +31,7 @@
     var step=[];
     var max_levels=100;
     var pass_count=0;
-    var timer;
+    var t0;
     var timeout=5*60*1000;
 
     var saveData = function() {
@@ -189,7 +189,7 @@
       loop_function: function(){
         var results = jsPsych.data.get().select("accum_score").values;
         accum_score= results[results.length-1];
-        if((accum_score>=points_to_pass)||trial_index>=max_levels){
+        if((accum_score>=points_to_pass)||trial_index>=max_levels||new Date()-t0>=timeout){
           if (accum_score>=points_to_pass) {
             pass_count++;
           };
@@ -211,24 +211,18 @@
     var big_if_node={
       timeline:[if_node,did_win],
       loop_function: function(){
-        if (trial_index>=max_levels){
+        if (trial_index>=max_levels||new Date()-t0>=timeout){
           return false;
         }else{
           return true;
         }
       },
       on_load: function() {
-        if (!timer) {
-          timer = jsPsych.pluginAPI.setTimeout(timeUp, timeout);
+        if (!t0) {
+          t0 = new Date();
         }
       }
     }
-
-    var timeUp = function() {
-      trial_index=max_levels;
-      jsPsych.endCurrentTimeline();
-      jsPsych.finishTrial();
-    };
 
     var winner = {
       type: 'html-keyboard-response',
@@ -243,7 +237,6 @@
         return html
         },
       on_load: function() {
-        jsPsych.pluginAPI.clearAllTimeouts();
         setTimeout(saveData, 100)
       },
       choices: jsPsych.NO_KEYS,
@@ -253,7 +246,6 @@
       if(event.key.toLowerCase() == 'q' && event.ctrlKey && event.altKey) {
         window.removeEventListener('keydown', endExperiment)
         jsPsych.pauseExperiment()  // prevent next trial from loading after finishing current trial
-        jsPsych.pluginAPI.clearAllTimeouts();
         jsPsych.finishTrial()
         setTimeout(saveData, 100)
         jsPsych.endExperiment(`
