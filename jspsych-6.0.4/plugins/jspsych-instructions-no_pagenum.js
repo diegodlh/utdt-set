@@ -12,12 +12,12 @@
  *
  */
 
-jsPsych.plugins.instructions = (function() {
+jsPsych.plugins["instructions-no_pagenum"]=(function() {
 
   var plugin = {};
 
   plugin.info = {
-    name: 'instructions',
+    name: 'instructions-no_pagenum',
     description: '',
     parameters: {
       pages: {
@@ -107,7 +107,7 @@ jsPsych.plugins.instructions = (function() {
     function show_current_page() {
       let pagenum_display = "";
       if(trial.show_page_number) {
-          pagenum_display = "Page "+(current_page+1)+"/"+trial.pages.length; // UNCOMMENT THIS TO SHOW PAGE X/Y LEGEND
+          // pagenum_display = "Page "+(current_page+1)+"/"+trial.pages.length; // UNCOMMENT THIS TO SHOW PAGE X/Y LEGEND
       }
       display_element.innerHTML = trial.pages[current_page];
       if (trial.show_clickable_nav) {

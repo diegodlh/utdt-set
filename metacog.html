@@ -5,7 +5,7 @@
         <script src="jspsych-6.0.4/jspsych.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-image-button-response.js"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-instructions.js"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-instructions-no_pagenum.js"></script>
         <script src="circles.js?v=1"></script>
         <script src="report_confidence.js"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
@@ -33,6 +33,8 @@
     var pass_count=0;
     var t0;
     var timeout=5*60*1000;
+
+
 
     var saveData = function() {
 
@@ -94,14 +96,19 @@
       }
     };
 
+
+
+
+
+
     var intro = {
-      type: 'instructions',
+      type: 'instructions-no_pagenum',
       pages: [
-        "<p align='center' style='font-size:40px;' > ¡BIENVENIDO AL JUEGO DE LOS CÍRCULOS! <br><img src='images/bienvenidx.png'/img><br> APRETÁ SEGUIR PARA APRENDER A JUGAR.</p>",
-        "<p align='center' style='font-size:35px;' > EN ESTE JUEGO VAS A VER MUCHOS CÍRCULOS <br> <br> Y VOS TENÉS QUE HACER CLICK EN EL MÁS GRANDE <br><img src='images/example_circles.png'/img><br> APRETÁ SEGUIR PARA CONTINUAR </p>",
-        "<p align='center' style='font-size:35px;' > DESPUÉS DE ELEGIR EL MÁS GRANDE, VAS A VER DOS BOTONES. <br> <br> SI ESTÁS SEGURO DE QUE ELEGISTE EL CÍRCULO CORRECTO, APRETÁ EL BOTÓN VERDE <br><br> Y SI NO ESTÁS SEGURO, APRETÁ EL ROJO <br><img src='images/example_confidence.png'/img><br> APRETÁ SEGUIR PARA CONTINUAR </p>  ",
-        "<p align='center' style='font-size:30px;' > SI APRETÁS EL BOTÓN VERDE Y HABÍAS ELEGIDO EL CÍRCULO CORRECTO, GANÁS 3 PUNTOS. <br><br>PERO SI APRETÁS EL BOTÓN VERDE Y NO HABÍAS ELEGIDO EL CÍRCULO CORRECTO, PERDÉS 3 PUNTOS.<br> <br>Y SI APRETÁS EL BOTÓN ROJO, GANÁS SIEMPRE 1 PUNTO. <br><img src='images/example_points.png'/img><br> APRETÁ SEGUIR PARA CONTINUAR </p>  ",
-        "<p align='center' style='font-size:35px;' > ¡CADA VEZ QUE LLEGUES A 10 PUNTOS PASÁS DE NIVEL!<br><img src='images/congrats.jpg'/img><br>APRETÁ SEGUIR PARA EMPEZAR </p>",
+        "<p align='center' style='font-size:40px;' > ¡BIENVENIDO AL JUEGO DE LOS CÍRCULOS! <br><img src='images/bienvenidx.png'/img><br> APRETÁ SEGUIR PARA APRENDER A JUGAR</p>",
+        "<p align='center' ><div  style='font-size:30px;'> EN ESTE JUEGO VAS A VER MUCHOS CÍRCULOS<br> <br> Y VOS TENÉS QUE HACER CLICK EN EL MÁS GRANDE <br> </div> <img src='images/example_circles.png'/img> <div style='font-size:20px';> APRETÁ SEGUIR PARA CONTINUAR </div></p>",
+        "<p align='center' style='font-size:30px;' > DESPUÉS DE ELEGIR EL MÁS GRANDE, VAS A VER DOS BOTONES. <br><br><br> <img src='images/example_confidence.png'/img> <br><br><br> SI ESTÁS SEGURO DE QUE ELEGISTE EL CÍRCULO CORRECTO, APRETÁ EL VERDE <br><br><br> Y SI NO ESTÁS SEGURO, APRETÁ EL ROJO  </p>  ",
+        "<p align='center' style='font-size:25px;' > SI APRETÁS EL BOTÓN VERDE Y HABÍAS ELEGIDO EL CÍRCULO CORRECTO, GANÁS 3 PUNTOS. <br><br>PERO SI NO HABÍAS ELEGIDO EL CÍRCULO CORRECTO, PERDÉS 3 PUNTOS.<br><br> <br>Y SI APRETÁS EL BOTÓN ROJO, GANÁS SIEMPRE 1 PUNTO. <br><img src='images/example_points.png'/img> </p>  ",
+        "<p align='center' style='font-size:35px;' > ¡CADA VEZ QUE LLEGUES A 10 PUNTOS O MÁS PASÁS DE NIVEL!<br><img src='images/congrats.jpg'/img><br>APRETÁ SEGUIR PARA EMPEZAR </p>",
       ],
       allow_keys: false,
       allow_backward: true,
@@ -126,33 +133,29 @@
           trial_index++;
         },
         level: function(){
-            if (trial_index==0){
-              return level;
-            } else{
-              var results = jsPsych.data.get().select("won").values;
-              var last_trial_won=results[results.length-1];
-              if ((last_trial_won && consecutive_wins ==1) || (!last_trial_won && consecutive_losses==1) ){ // reversal
-                step_index++;
-                step=stepSizes[Math.min(step_index,stepSizes.length-1)];
-              };
-              if(trial_index==1){
-                if(last_trial_won){
-                  level=Math.max(0,level-step);
-                }else{
-                  level=Math.max(0,level+step);
-                }
-              } else {
-                if(last_trial_won && ( (consecutive_wins==nDown ) ) ){
-                    level=Math.max(0,level-step);
-                    consecutive_wins=0;
-                }else if (!last_trial_won && ( (consecutive_losses==nUp) ) ) {
-                  level=Math.min(1,level+step);
-                  consecutive_losses=0;
-                }
+          if (trial_index>0){
+            var results = jsPsych.data.get().select("won").values;
+            var last_trial_won=results[results.length-1];
+            if ((last_trial_won && consecutive_wins ==1) || (!last_trial_won && consecutive_losses==1) ){ // reversal
+              step_index++;
+              step=stepSizes[Math.min(step_index,stepSizes.length-1)];
+            };
+            if(trial_index==1){
+              if(last_trial_won){
+                level=Math.max(0,level-step);
+              }else{
+                level=Math.max(0,level+step);
               }
-              //console.log(level)
-              return level;
+            } else {
+              if(last_trial_won && ( (consecutive_wins % nDown==0 ) ) ){
+                  level=Math.max(0,level-step);
+              }else if (!last_trial_won && ( (consecutive_losses%nUp==0) ) ) {
+                level=Math.min(1,level+step);
+              }
             }
+          }
+          console.log(level)
+          return level;
         },
         on_finish: function(){
             var results = jsPsych.data.get().select("won").values;
