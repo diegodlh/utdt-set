@@ -107,7 +107,7 @@ jsPsych.plugins.instructions = (function() {
     function show_current_page() {
       let pagenum_display = "";
       if(trial.show_page_number) {
-          pagenum_display = "Page "+(current_page+1)+"/"+trial.pages.length; // UNCOMMENT THIS TO SHOW PAGE X/Y LEGEND
+          pagenum_display = "Page "+(current_page+1)+"/"+trial.pages.length;
       }
       display_element.innerHTML = trial.pages[current_page];
       if (trial.show_clickable_nav) {
@@ -151,7 +151,7 @@ jsPsych.plugins.instructions = (function() {
       } else {
         add_current_page_to_view_history()
         current_page++;
-
+      
         jsPsych.data.write({"view_history": JSON.stringify(view_history[view_history.length-1]), "ts_end": Date.now()})
         show_current_page();
       }
