@@ -24,7 +24,8 @@
     	var timeout_known = 60
     	var video_decision_timeout = 30
     	var prewarn = 60
-		var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>'
+		// var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>'
+		var client_ip = 0
 
     	for (gid=501; gid<=511; gid++) {
     		stimuli[gid-1] = {"retest": stimuli[0].retest}
