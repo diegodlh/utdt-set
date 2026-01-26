@@ -1,9 +1,9 @@
 var keystrings = {
-    set: 'Numpad8',
-    noset: 'Numpad2',
-    explain: 'Numpad4',
-    noexplain: 'Numpad6',
-    next: 'Numpad5'
+    set: 'KeyW',
+    noset: 'KeyX',
+    explain: 'KeyA',
+    noexplain: 'KeyD',
+    next: 'KeyS'
 }
 
 var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=0, max_score, uid, trial_num, next=false} = {}) {
