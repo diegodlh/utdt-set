@@ -302,7 +302,8 @@
 			var preloadLink = document.createElement("link");
 			preloadLink.href = video;
 			preloadLink.rel = "preload";
-			preloadLink.as = "video";
+			// preloadLink.as = "video";
+			preloadLink.as = "fetch";  // Chrome-compatible alternative for video preloading
 			preloadLink.setAttribute("onload", "onVideoPreload()");
 			document.head.appendChild(preloadLink);
 		}
