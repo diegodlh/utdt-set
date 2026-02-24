@@ -514,28 +514,6 @@
 					data.response = data.key_press == keystrings.set ? 'set' : 'noset'
 					data.correct = data.key_press == correct_key;
 				}
-			}
-		}
-
-		var explanation = {
-			type: 'html-keyboard-response',
-			stimulus: function() {
-				var response = jsPsych.data.getLastTrialData().values()[0].response				
-				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, explain: 'ask',
-					score: score, max_score: max_score, uid:uid, trial_num:trial_num})
-			},
-			choices: [keystrings.explain, keystrings.noexplain],
-			data: {	trial_part: 'decision', cards: jsPsych.timelineVariable('cards') },
-			on_start: function(trial) {
-				trial.data.set_type = jsPsych.data.getLastTrialData().values()[0].set_type
-				trial.data.set = jsPsych.data.getLastTrialData().values()[0].set
-				trial.data.response = jsPsych.data.getLastTrialData().values()[0].response
-				trial.data.correct = jsPsych.data.getLastTrialData().values()[0].correct
-			},
-			on_finish: function(data) {
-				if (data.key_press) {
-					data.explain = data.key_press == keystrings.explain
-				}
 				score = jsPsych.data.get().filter({trial_part: 'cards'}).select('correct').sum()
 			}
 		}
@@ -544,11 +522,11 @@
 			type: 'html-keyboard-response',
 			stimulus: function() {
 				var correct = jsPsych.data.getLastTrialData().values()[0].correct
-				var explain = jsPsych.data.getLastTrialData().values()[0].explain
+				var explain = jsPsych.timelineVariable('explain', true)
 				var response = jsPsych.data.getLastTrialData().values()[0].response
 				var type = jsPsych.data.getLastTrialData().values()[0].set ? 'set' : 'noset'
 				return makeHTML({cards: jsPsych.timelineVariable('cards', true), response: response, cards_bg: correct ? 'lawngreen' : 'red',
-					explain: explain ? type : 'no', score: score, max_score: max_score, uid:uid, trial_num:trial_num, next:true})
+					explain: explain ? type : undefined, score: score, max_score: max_score, uid:uid, trial_num:trial_num, next:true})
 		    },
 			choices: [keystrings.next],
 			data: { trial_part: 'feedback', cards: jsPsych.timelineVariable('cards')  },
@@ -565,7 +543,7 @@
 		var test = {
 			// set test timeout; as this will be a cutoff for extraordinarily long sessions, I think it shouldn't pause if bathroom, etc
 			// if still pause is desired, check stackoverflow 3969475
-			timeline: [cards, explanation, feedback],
+			timeline: [cards, feedback],
 			timeline_variables: trials,
 			on_load: function() {
 				if (!timer) {

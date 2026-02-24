@@ -7,7 +7,7 @@ var keystrings = {
 }
 
 var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=0, max_score, uid, trial_num, next=false} = {}) {
-	var cards_width = .6
+	var cards_width = .75
 	var uid = uid.toString().padStart(3, '0')
 	var trial_num = trial_num.toString().padStart(2, '0')
 
@@ -34,33 +34,36 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
     var html = `
     <div style="position:relative">
     	<table cellpadding=0 style="width:100vw;border-collapse:collapse">
-            <tr style="height:50vh">
+            <tr style="height:${explain_html ? 50 : 100}vh">
                 <td rowspan=2 style="width:${1/max_score*100}vh;background:#000;vertical-align:bottom">
                 	${score_html}
                 </td>
                 <td style="background:${cards_bg}">
                     <table style="width:100%">
                         <tr>
-                            <td style="width:${(1-cards_width)/2*100}%"></td>
+                            <td style="width:${(1-cards_width)*1/5*100}%"></td>
                             <td style="width:${cards_width*100}%">
                                 ${cardsHTML(cards)}
                             </td>
-                            <td style="width:${(1-cards_width)/2*100}%">
-                                <img src="images/set.png" onclick=keydown("${keystrings.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/><br>
+                            <td style="width:${(1-cards_width)*4/5*100}%">
+                                <img src="images/set.png" onclick=keydown("${keystrings.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/>
+                                <br><br>
                                 <img src="images/noset.png" onclick=keydown("${keystrings.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
                             </td>
                         </tr>
                     </table>
                 </td>
+                <td rowspan=2 style="width:10%;background:#000;vertical-align:middle">
+                    <img src="images/next.png" onclick=keydown("${keystrings.next}") style="width:90%" ${next ? '' : 'hidden'} />
+                </td>
             </tr>
-            <tr style="height:50vh">
+            <tr style="height:50vh" ${explain_html ? '' : "hidden"}>
             	<td style="background:#AAA;position:relative">
             		${explain_html}
-            		<p style="position:absolute;bottom:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid + '.' + trial_num}</p>
             	</td>
             </tr>
         </table>
-        ${next ? `<img src="images/next.png" _onclick=keydown("${keystrings.next}") style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:10%" />` : ''}
+        <p style="color:#FFF;position:absolute;bottom:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid + '.' + trial_num}</p>
     </div>
         `;
     return html
@@ -102,8 +105,8 @@ var explainHTML = function(cards, cards_width, type) {
     var html = `
 		<table style="width:100%">
 			<tr>
-				<td style="width:${(1-cards_width)/2*100}%">
-                    <img src="images/help.png" style="width:50%;opacity:.75"/>
+				<td style="width:${(1-cards_width)*1/5*100}%">
+                    <img src="images/help.png" style="width:50%;opacity:.75" hidden/>
                 </td>
 				<td style="width:${cards_width*100}%">
 					<table cellpadding=0 style="border-spacing:20px;width:100%">
@@ -147,7 +150,7 @@ var explainHTML = function(cards, cards_width, type) {
     						</td>
     					</tr>
     				</table>
-	    		<td style="width:${(1-cards_width)/2*100}%">
+                <td style="width:${(1-cards_width)*4/5*100}%">
 	    			<img src="images/${type}.png" style="width:75%" />
 	    		</td>
 			</tr>
