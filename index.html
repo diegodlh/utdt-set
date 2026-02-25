@@ -14,6 +14,7 @@
         <script src="auxiliary.js?v=3"></script>
         <script src="preload_images.js?v=1"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+		<script src="secretKeyboard.js"></script>
     </head>
     <body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;" style="cursor:none"></body>
     <script>
@@ -244,8 +245,16 @@
 		}
 
 		var endExperiment = function(event) {
-			if(event.key.toLowerCase() == 'q' && event.ctrlKey && event.altKey) {
-					if (timer) { 
+			if(
+				event.key.toLowerCase() == 'q'
+				&& event.ctrlKey
+				// && event.altKey
+			) {
+					// prevent default browser behavior for key combination
+					event.preventDefault()
+					event.stopPropagation()
+
+					if (timer) {
 						timer.clear();
 						timer = null;
 					};
@@ -356,7 +365,15 @@
 			choices: jsPsych.NO_KEYS,
 			on_load: function() {
 				window.addEventListener('keydown', function _listener(event) {
-					if(event.key.toLowerCase() == 's' && event.ctrlKey && event.altKey) {
+					if(
+						event.key.toLowerCase() == 's'
+						&& event.ctrlKey
+						// && event.altKey
+					) {
+						// prevent default browser behavior for key combination
+						event.preventDefault()
+						event.stopPropagation()
+
 						if (mode != 'test' || video_preloaded) {
 							// if in test mode, hold screen can only be closed if video has been preloaded successfully
 							jsPsych.finishTrial( {'key_press': 'ctrl+alt+s'} )
@@ -366,8 +383,16 @@
 						}
 					}
 					var last_trial = jsPsych.data.getLastTrialData().values()[0]
-					if (last_trial && last_trial.trial_type == 'instructions' &&
-						event.key.toLowerCase() == 'r' && event.ctrlKey && event.altKey) {
+					if (
+						last_trial && last_trial.trial_type == 'instructions' &&
+						event.key.toLowerCase() == 'r'
+						&& event.ctrlKey
+						// && event.altKey
+					) {
+						// prevent default browser behavior for key combination
+						event.preventDefault()
+						event.stopPropagation()
+
 						jsPsych.finishTrial( {'key_press': 'ctrl+alt+r'} );
 						window.removeEventListener('keydown', _listener);
 					};
