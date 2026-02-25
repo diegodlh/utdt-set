@@ -83,7 +83,7 @@ var cardsHTML = function(cards) {
         var color = colors[card[3]-1]
         html += '<td style="position:relative"><img src="images/card.png" style="width:100%;display:block;z-index:-1" />'
         for (j=0; j < num; j++) {
-            var img = 'images/' + shape + '_' + texture + '_' + color + '.png'
+            var img = 'images/' + shape + '_' + texture + '_' + color + '.svg'
             var yrel = 29 * .8 * 2 / 72 / 3  // icon's height relative to card's height
             var top = (1 - yrel * num - .1 * (num - 1)) / 2 + (yrel + .1) * j
             html += `<img src="${img}" style="width:80%;position:absolute;top:${top*100}%;left:10%;display:block" />`
