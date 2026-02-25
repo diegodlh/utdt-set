@@ -3,6 +3,7 @@
     <head>
     	<meta charset="utf-8"/>
         <title>Pequeños Maestros: Set!</title>
+		<link rel="manifest" href="manifest.json">
         <script src="jspsych-6.0.4/jspsych.js?v=2"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js?v=1"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-instructions.js?v=3"></script>
@@ -17,6 +18,11 @@
 		<script src="secretKeyboard.js"></script>
 		<script src="fullscreen.js"></script>
     </head>
+	<script>
+		if ("serviceWorker" in navigator) {
+			navigator.serviceWorker.register("sw.js");
+		}
+	</script>
     <body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;" style="cursor:none"></body>
     <script>
 
