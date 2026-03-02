@@ -233,7 +233,15 @@ jsPsych.plugins.instructions = (function() {
     };
     var tmin_timer = window.setTimeout(allowEnd, trial.tmin*1000);
     var tminSkipListener = function(event) {
-      if(event.key.toLowerCase() == 's' && event.ctrlKey && event.altKey) {
+      if(
+        event.key.toLowerCase() == 's'
+        && event.ctrlKey
+        // && event.altKey
+      ) {
+        // prevent default browser behavior for key combination
+        event.preventDefault()
+        event.stopPropagation()
+
         window.clearTimeout(tmin_timer);
         allowEnd();
       };

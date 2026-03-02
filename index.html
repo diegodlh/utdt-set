@@ -416,7 +416,7 @@
 
 		var instructions = {
 			// set timeout; idem test below (I think it should be continuous, without pauses)
-			type: 'instructions',
+			type: 'instructions',  // note we are using a custom jspsych-instructions plugin
 			pages: [
 				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, isfirst: true}),
 				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, sideB: 'instructions/page1b.jpg'}),
