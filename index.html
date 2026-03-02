@@ -380,7 +380,7 @@
     		prompt: `
     			<div style="width:100vw;height:100vh;display:table-cell;vertical-align:middle;cursor:auto">
 	    			<img src="images/known.png" style="height:25vh" /img><br>
-	    			<img src="images/s_key.png" onclick=keydown("KeyS") style="height:25vh;margin:5%" /><img src="images/n_key.png" onclick=keydown("KeyN") style="height:25vh;margin:5%" />
+                    <img src="images/s_key.png" onpointerdown=keydown("KeyS") style="height:25vh;margin:5%" /><img src="images/n_key.png" onpointerdown=keydown("KeyN") style="height:25vh;margin:5%" />
 	    			<p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid_string}</p>
     			</div>
 			`,
@@ -408,8 +408,8 @@
 			// disable_menu: true,
 			on_load: function() {
 				removeTimeWarning();
-				document.getElementById("video-next").addEventListener("click", () => { keydown(keystrings.next) });
-				document.getElementById("video-back").addEventListener("click", () => { keydown("ArrowLeft") });
+				document.getElementById("video-next").addEventListener("pointerdown", () => { keydown(keystrings.next) });
+				document.getElementById("video-back").addEventListener("pointerdown", () => { keydown("ArrowLeft") });
 			},
 			data: {}
 		}

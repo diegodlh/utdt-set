@@ -46,15 +46,15 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
                                 ${cardsHTML(cards)}
                             </td>
                             <td style="width:${(1-cards_width)*4/5*100}%">
-                                <img src="images/set.png" onclick=keydown("${keystrings.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/>
+                                <img src="images/set.png" onpointerdown=keydown("${keystrings.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/>
                                 <br><br>
-                                <img src="images/noset.png" onclick=keydown("${keystrings.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
+                                <img src="images/noset.png" onpointerdown=keydown("${keystrings.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
                             </td>
                         </tr>
                     </table>
                 </td>
                 <td rowspan=2 style="width:10%;background:#000;vertical-align:middle">
-                    <img src="images/next.png" onclick=keydown("${keystrings.next}") style="width:90%" ${next ? '' : 'hidden'} />
+                    <img src="images/next.png" onpointerdown=keydown("${keystrings.next}") style="width:90%" ${next ? '' : 'hidden'} />
                 </td>
             </tr>
             <tr style="height:50vh" ${explain_html ? '' : "hidden"}>
@@ -163,8 +163,8 @@ var makeInstruction = function({sideA, sideB='', isfirst=false, islast=false, ui
     var html = `
         <div style="width:100vw;height:100vh;position:relative;display:table-cell;vertical-align:middle;background:#FFF">
             <img src="${sideA}" style="width:${80*2/3}vw;opacity:${sideB ? .5 : 1}" /><img src="${sideB}" style="width:${80*1/3}vw" />
-            <img src="${!isfirst ? 'instructions/leftkey.png' : ''}" onclick=keydown("ArrowLeft") style="position:absolute;left:0;bottom:0">
-            <img id="${islast ? 'lastnext' : ''}" src="instructions/rightkey.png" onclick=keydown("ArrowRight") style="position:absolute;right:0;bottom:0">
+            <img src="${!isfirst ? 'instructions/leftkey.png' : ''}" onpointerdown=keydown("ArrowLeft") style="position:absolute;left:0;bottom:0">
+            <img id="${islast ? 'lastnext' : ''}" src="instructions/rightkey.png" onpointerdown=keydown("ArrowRight") style="position:absolute;right:0;bottom:0">
             <p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid}</p>
         <div>
         `;
