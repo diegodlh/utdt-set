@@ -58,9 +58,22 @@
   function updateButtonVisibility() {
     btn.style.display = isFullscreen() ? "none" : "block";
   }
+
+  function onFullscreenChange() {
+    updateButtonVisibility();
+    if (isFullscreen()) {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock("landscape").catch(console.error);
+      }
+    } else {
+      if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+      }
+    }
+  }
   
-  document.addEventListener("fullscreenchange", updateButtonVisibility);
-  document.addEventListener("webkitfullscreenchange", updateButtonVisibility);
+  document.addEventListener("fullscreenchange", onFullscreenChange);
+  document.addEventListener("webkitfullscreenchange", onFullscreenChange);
 
   updateButtonVisibility();
 })();
