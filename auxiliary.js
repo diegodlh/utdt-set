@@ -161,7 +161,7 @@ var explainHTML = function(cards, cards_width, type) {
 
 var makeInstruction = function({sideA, sideB='', isfirst=false, islast=false, uid=''  } = {}) {
     var html = `
-        <div style="width:100vw;height:100vh;position:relative;display:table-cell;vertical-align:middle">
+        <div style="width:100vw;height:100vh;position:relative;display:table-cell;vertical-align:middle;background:#FFF">
             <img src="${sideA}" style="width:${80*2/3}vw;opacity:${sideB ? .5 : 1}" /><img src="${sideB}" style="width:${80*1/3}vw" />
             <img src="${!isfirst ? 'instructions/leftkey.png' : ''}" onclick=keydown("ArrowLeft") style="position:absolute;left:0;bottom:0">
             <img id="${islast ? 'lastnext' : ''}" src="instructions/rightkey.png" onclick=keydown("ArrowRight") style="position:absolute;right:0;bottom:0">
