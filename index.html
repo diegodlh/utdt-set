@@ -594,9 +594,9 @@
 		}
 		timeline.push(test, winner)
 
-		var preload = [preload_images]
+		var preload = [...preload_images]
     	if (mode == 'retest') {
-    		preload.push(preload_instructions)
+    		preload.push(...preload_instructions)
     	}
     	preload.push('images/known.png', 'images/s_key.png', 'images/n_key.png')
 
