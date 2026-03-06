@@ -27,6 +27,16 @@
   input.autocorrect = "off";
   input.spellcheck = false;
 
+  input.addEventListener("input", (event) => {
+    document.dispatchEvent(new KeyboardEvent("keydown", {
+      key: event.data,
+      ctrlKey: true,
+      altKey: true,
+      bubbles: true,
+      cancelable: true,
+    }));
+  });
+
   Object.assign(input.style, {
     position: "fixed",
     bottom: "0",

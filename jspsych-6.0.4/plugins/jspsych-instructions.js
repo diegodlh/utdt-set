@@ -236,7 +236,7 @@ jsPsych.plugins.instructions = (function() {
       if(
         event.key.toLowerCase() == 's'
         && event.ctrlKey
-        // && event.altKey
+        && event.altKey
       ) {
         // prevent default browser behavior for key combination
         event.preventDefault()
