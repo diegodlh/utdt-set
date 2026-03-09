@@ -1,3 +1,7 @@
+html, body {
+  overscroll-behavior-y: contain;
+}
+
 .jspsych-content-wrapper {
   background: #FFF;
 }
