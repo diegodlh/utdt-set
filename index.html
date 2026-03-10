@@ -25,6 +25,18 @@
 		}
 	</script>
     <body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;" style="cursor:none"></body>
+	<script type="module">
+		import { S3Client } from "https://esm.sh/jsr/@bradenmacdonald/s3-lite-client@0.9.5";
+
+		const s3ClientConfig = JSON.parse(
+			localStorage.getItem("s3ClientConfig")
+		);
+		try {
+			window.s3Client = new S3Client(s3ClientConfig);
+		} catch (err) {
+			console.error("Could not initialize S3 Client: " + err);
+		}
+	</script>
     <script>
 
     	var tmin_instructions = 100
@@ -170,21 +182,16 @@
 
 			// }
 
-			function saveRemote(filename, csvdata) {
-				var xhr = new XMLHttpRequest();
+			async function saveRemote(filename, csvdata) {
 				while(true) {
-					xhr.open('POST', 'write_data.php', false);
-					xhr.setRequestHeader('Content-Type', 'application/json');
 					try {
-						xhr.send(JSON.stringify({filename: filename, filedata: csvdata}));
-					} catch(error) {
-						console.log(error)
-					}
-					// if(xhr.status == 200) {
-					if(false) {
+						response = await s3Client.putObject(
+							filename,
+							csvdata
+						);
 						console.log(filename + ' successfully saved to server.')
 						break
-					} else {
+					} catch (err) {					
 						if (!window.confirm(filename + ' could not be saved to server. Try again?')) {
 							localStorage.setItem(filename, csvdata)
 							var blob = new Blob([csvdata], {type: 'text/csv'})
@@ -258,6 +265,23 @@
 		}
 
 		window.addEventListener('keydown', endExperiment)
+
+		// HACKY
+		// Check localStorage for s3ClientConfig and ask for it if needed
+		// before any other prompts are shown
+		if (!localStorage.getItem("s3ClientConfig")) {
+			const s3ClientConfigString = prompt("S3 Client Config:");
+			if (s3ClientConfigString) {
+				try {
+					s3ClientConfig = JSON.parse(s3ClientConfigString);
+					// TODO: validate config string?
+					localStorage.setItem("s3ClientConfig", s3ClientConfigString);
+				} catch (err) {
+					console.error("Could not save S3 Client Config: " + err);
+				}
+				
+			}
+		}
 
 		var uid = urlParams.get('uid')
     	while (true) {
