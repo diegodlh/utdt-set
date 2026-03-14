@@ -14,8 +14,8 @@ function trialType(card1, card2, card3) {
         // count unique attribute values
         const uniqueCount = new Set([card1[i], card2[i], card3[i]]).size;
 
-        if (uniqueCount === 1) sameMask |= (1 << i);
-        if (uniqueCount === 2) brokenMask |= (1 << i);
+        if (uniqueCount === 1) sameMask |= (1 << (3 - i));  // array index != bit index
+        if (uniqueCount === 2) brokenMask |= (1 << (3 - i));
     }
 
     if (brokenMask === 0) {
