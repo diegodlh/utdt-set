@@ -1,4 +1,11 @@
 function trialType(card1, card2, card3) {
+    if (
+        card1.length != 4 ||
+        card2.length != 4 ||
+        card3.length != 4
+    ) {
+        throw new Error("One or more cards are not length=4!");
+    }
     let sameMask = 0;
     let brokenMask = 0;
 
