@@ -35,7 +35,7 @@ function decodeCard(n){
     const texture = Math.floor(n/3) + 1;
     n %= 3;
 
-    const color = n;
+    const color = n + 1;
 
     return [num, shape, texture, color];
 }
@@ -57,11 +57,26 @@ function generateAllTrials() {
                 const type = trialType(card1, card2, card3);
 
                 count++;
-                (allTrials[type] ??= []).push([card1, card2, card3]);
+                (allTrials[type] ??= []).push([
+                    Number(card1.join("")),
+                    Number(card2.join("")),
+                    Number(card3.join("")),
+                ]);
             }
         }
     }
 
     console.log(`Generated ${count} trials!`);
     return allTrials;
+}
+
+function shuffleCards(card1, card2, card3) {
+    const cards = [card1, card2, card3];
+    const shuffledCards = [];
+
+    shuffledCards[0] = cards.splice(Math.floor(Math.random() * cards.length), 1)[0];
+    shuffledCards[1] = cards.splice(Math.floor(Math.random() * cards.length), 1)[0];
+    shuffledCards[2] = cards[0];
+
+    return shuffledCards;
 }

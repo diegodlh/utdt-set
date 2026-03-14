@@ -10,13 +10,13 @@
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=1"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=4"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=1"></script>
-        <script type="text/javascript" src="stimuli.json?v=1"></script>
         <script src="auxiliary.js?v=3"></script>
         <script src="preload_images.js?v=1"></script>
         <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
 		<link href="style.css" rel="stylesheet">
 		<script src="secretKeyboard.js"></script>
 		<script src="fullscreen.js"></script>
+		<script src="trials.js"></script>
     </head>
     <body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;" style="cursor:none"></body>
 	<script type="module">
@@ -41,13 +41,6 @@
     	var prewarn = 60
 		// var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>'
 		var client_ip = 0
-
-    	for (gid=501; gid<=511; gid++) {
-    		stimuli[gid-1] = {"retest": stimuli[0].retest}
-    	}
-    	for (mock_id=900; mock_id<=999; mock_id++) {
-    		stimuli[mock_id-1] = stimuli[0];
-    	}
 
     	function Timer(user_callback, delay, prewarn) {
     		var timerId, start, remaining = (delay-prewarn)*1000;
@@ -205,7 +198,9 @@
 				}
 			}
 
-			var basename = uid_string + mode + jsPsych.startTime().toISOString()
+			var basename = (
+				`${uid_string}_${mode}_${jsPsych.startTime().toISOString()}`
+			);
 
 			// saveLocal()
 			// saveLocal()
@@ -277,10 +272,41 @@
 			}
 		}
 
+		// synchronously fetch and parse stimuli csv
+		const xhr = new XMLHttpRequest();
+		xhr.open("GET", "stimuli.csv", false); // false = synchronous
+		xhr.send();
+
+		function csvToJson(csv) {
+			const [headerLine, ...rows] = csv.trim().split("\n");
+			const headers = headerLine.split(",");
+
+			return rows.map(row =>
+				Object.fromEntries(
+					row.split(",").map((v, i) => [headers[i], v])
+				)
+			);
+		}
+
+		const stimuli = {};
+		for (const stimulus of csvToJson(xhr.responseText)) {
+			if (!Object.hasOwn(stimuli, stimulus.id)) {
+				stimuli[stimulus.id] = [];
+			}
+			const trial_idx = stimulus.trial - 1;
+			if (stimuli[stimulus.id][trial_idx] != undefined) {
+				console.error(`Trial ${stimulus.trial} of ID ${stimulus.id} will be overwritten!`)
+			}
+			stimuli[stimulus.id][trial_idx] = {
+				"type": stimulus.type,
+				"explain": stimulus.explain
+			}
+		}
+		
 		var uid = urlParams.get('uid')
     	while (true) {
     		if (uid) {
-    			if (stimuli[uid-1]) { break }
+    			if (Object.hasOwn(stimuli, uid)) { break }
     		}
     		var uid = window.prompt('uid:', '')    		
 		}
@@ -289,7 +315,7 @@
 		var mode = urlParams.get('mode')
 		while (true) {
 			if (mode) {
-				if (mode in stimuli[uid-1]) { break }
+				if (modes.includes(mode)) { break }
 			}
 			let mode_choice = window.prompt('1 (test) / 2 (retest):', '');
 			mode = modes[mode_choice - 1];
@@ -316,7 +342,18 @@
 			stylesheet.innerHTML = '#holdscreen {background-color:#AAA;}'
 		}
 
-		var trials = stimuli[uid-1][mode]
+		var trials = stimuli[uid];
+
+		// randomly pick cards for each trial type
+		const allTrials = generateAllTrials();
+
+		for (const trial of trials) {
+			const typeTrials = allTrials[trial.type];
+			// randomly pick one set of three cards matching the trial type
+			const cards = typeTrials[Math.floor(Math.random() * typeTrials.length)];
+			trial.cards = shuffleCards(...cards);
+		}
+
 		var trial_num = 0
 		var max_score = trials.length
 		
