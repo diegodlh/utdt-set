@@ -302,6 +302,23 @@
 				"explain": stimulus.explain
 			}
 		}
+		// check for, warn and fill any gaps in the trial sequences
+		for (const  [id, trials] of Object.entries(stimuli)) {
+			for (let i=0; i<trials.length; i++) {
+				if (trials[i] == undefined) {
+					let trial;
+					let j = i;
+					while (trial == undefined) {
+						j++;
+						trial = trials[j];
+					}
+					console.error(
+						`Trial ${i+1} of ID ${id} is undefined! Reusing trial ${j+1}.`
+					)
+					trials[i] = trial;
+				}
+			}
+		}
 		
 		var uid = urlParams.get('uid')
     	while (true) {
