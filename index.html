@@ -165,12 +165,27 @@
 		window.addEventListener('beforeunload', beforeunload)
 
 		var saveData = function() {
-			// function saveLocal(filename, csvdata) {
-
-			// }
+			function saveLocal(filename, csvdata) {
+				localStorage.setItem(filename, csvdata)
+				var blob = new Blob(
+					[csvdata],
+					// {type: 'text/csv'}
+				)
+				var a = document.createElement('a')
+				var url = URL.createObjectURL(blob)
+				a.href = url
+				a.download = filename
+				document.body.appendChild(a)
+				a.click()
+				setTimeout(function() {
+					document.body.removeChild(a)
+					window.URL.revokeObjectURL(url)
+				}, 0)
+			}
 
 			async function saveRemote(filename, csvdata) {
 				while(true) {
+					console.log(`Trying to save ${filename} remotely...`);
 					try {
 						response = await s3Client.putObject(
 							filename,
@@ -180,22 +195,13 @@
 						break
 					} catch (err) {					
 						if (!window.confirm(filename + ' could not be saved to server. Try again?')) {
-							localStorage.setItem(filename, csvdata)
-							var blob = new Blob([csvdata], {type: 'text/csv'})
-							var a = document.createElement('a')
-							var url = URL.createObjectURL(blob)
-							a.href = url
-							a.download = filename + '.csv'
-							document.body.appendChild(a)
-							a.click()
-							setTimeout(function() {
-								document.body.removeChild(a)
-								window.URL.revokeObjectURL(url)
-							}, 0)
+							// saveLocal(filename, csvdata);
 							break
 						}
 					}
 				}
+				console.log(`Saving ${filename} locally...`)
+				saveLocal(filename, csvdata);
 			}
 
 			var basename = (
@@ -204,8 +210,13 @@
 
 			// saveLocal()
 			// saveLocal()
-			saveRemote('data_' + basename, jsPsych.data.get().ignore('stimulus').csv())
-			saveRemote('intdata_' + basename, jsPsych.data.getInteractionData().csv())
+			const data = {
+				"data": jsPsych.data.get().ignore('stimulus').values(),
+				"intdata": jsPsych.data.getInteractionData().values()
+			}
+			saveRemote('data_' + basename + '.json', JSON.stringify(data, null, 2));
+			// saveRemote('data_' + basename + '.csv', jsPsych.data.get().ignore('stimulus').csv())
+			// saveRemote('intdata_' + basename + '.csv', jsPsych.data.getInteractionData().csv())
 		};
 
 		var keydown = function(keystring) {
