@@ -310,7 +310,7 @@
 			}
 			stimuli[stimulus.id][trial_idx] = {
 				"type": stimulus.type,
-				"explain": stimulus.explain
+				"explain": stimulus.explain > 0 ? true : false
 			}
 		}
 		// check for, warn and fill any gaps in the trial sequences
