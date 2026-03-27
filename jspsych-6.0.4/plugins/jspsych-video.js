@@ -165,7 +165,7 @@ jsPsych.plugins.video = (function() {
 
     video_html += `
       <img id="video-next" src="images/next.png" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:10%;visibility:hidden" />
-      <img id="video-back" src="instructions/leftkey.png" style="position:absolute;left:0;bottom:0;visibility:hidden">
+      <img id="video-back" src="images/repeat.png" style="position:absolute;left:0;bottom:0;visibility:hidden">
       <p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${trial.uid}</p>
     `;
 
