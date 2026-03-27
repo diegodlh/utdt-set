@@ -34,6 +34,7 @@ var preload_images = [
 'images/oval_striped_green.svg',
 'images/oval_striped_red.svg',
 'images/red.png',
+'images/repeat.png',
 'images/same.png',
 'images/set.png',
 'images/solid.png',
