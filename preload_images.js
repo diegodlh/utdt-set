@@ -63,5 +63,7 @@ var preload_instructions = [
 'instructions/page4b.jpg',
 'instructions/page5a.jpg',
 'instructions/page5b.jpg',
+'instructions/page6a.jpg',
+'instructions/page6b.jpg',
 'instructions/rightkey.png'
 ]
