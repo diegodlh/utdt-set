@@ -13,18 +13,18 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
 
 	var score_html = ''
     for (i = 0; i < score; i++) {
-    	score_html += '<img src="images/coin.png" style="width:100%;display:block" />\n'
+    	score_html += '<img src="images/coin.png?v=__VERSION__" style="width:100%;display:block" />\n'
     }
 
     var explain_html = ''
     if(explain=='ask') {
     	explain_html = `
-            <img src="images/help.png" onclick=keydown("${keystrings.explain}") style="height:25vh;margin:5vw"/>
-            <img src="images/nohelp.png" onclick=keydown("${keystrings.noexplain}") style="height:25vh;margin:5vw"/>`
+            <img src="images/help.png?v=__VERSION__" onclick=keydown("${keystrings.explain}") style="height:25vh;margin:5vw"/>
+            <img src="images/nohelp.png?v=__VERSION__" onclick=keydown("${keystrings.noexplain}") style="height:25vh;margin:5vw"/>`
     } else if(explain=='no') {
     	explain_html = `
-            <img src="images/help.png" style="height:25vh;margin:5vw;visibility:hidden"/>
-            <img src="images/nohelp.png" style="height:25vh;margin:5vw;opacity:.75"/>
+            <img src="images/help.png?v=__VERSION__" style="height:25vh;margin:5vw;visibility:hidden"/>
+            <img src="images/nohelp.png?v=__VERSION__" style="height:25vh;margin:5vw;opacity:.75"/>
             `;
     } else if(explain=='set' || explain=='noset') {
     	var type = explain
@@ -46,15 +46,15 @@ var makeHTML = function({cards, cards_bg="#AAA", response="", explain="", score=
                                 ${cardsHTML(cards)}
                             </td>
                             <td style="width:${(1-cards_width)*4/5*100}%">
-                                <img src="images/set.png" onpointerdown=keydown("${keystrings.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/>
+                                <img src="images/set.png?v=__VERSION__" onpointerdown=keydown("${keystrings.set}") style="width:75%;visibility:${ response=='noset' ? 'hidden' : 'visible' } "/>
                                 <br><br>
-                                <img src="images/noset.png" onpointerdown=keydown("${keystrings.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
+                                <img src="images/noset.png?v=__VERSION__" onpointerdown=keydown("${keystrings.noset}") style="width:75%;visibility:${ response=='set' ? 'hidden' : 'visible' } "/>
                             </td>
                         </tr>
                     </table>
                 </td>
                 <td rowspan=2 style="width:10%;background:#000;vertical-align:middle">
-                    <img src="images/next.png" onpointerdown=keydown("${keystrings.next}") style="width:90%" ${next ? '' : 'hidden'} />
+                    <img src="images/next.png?v=__VERSION__" onpointerdown=keydown("${keystrings.next}") style="width:90%" ${next ? '' : 'hidden'} />
                 </td>
             </tr>
             <tr style="height:50vh" ${explain_html ? '' : "hidden"}>
@@ -81,9 +81,9 @@ var cardsHTML = function(cards) {
         var shape = shapes[card[1]-1]
         var texture = textures[card[2]-1]
         var color = colors[card[3]-1]
-        html += '<td style="position:relative"><img src="images/card.png" style="width:100%;display:block;z-index:-1" />'
+        html += '<td style="position:relative"><img src="images/card.png?v=__VERSION__" style="width:100%;display:block;z-index:-1" />'
         for (j=0; j < num; j++) {
-            var img = 'images/' + shape + '_' + texture + '_' + color + '.svg'
+            var img = 'images/' + shape + '_' + texture + '_' + color + '.svg?v=__VERSION__'
             var yrel = 29 * .8 * 2 / 72 / 3  // icon's height relative to card's height
             var top = (1 - yrel * num - .1 * (num - 1)) / 2 + (yrel + .1) * j
             html += `<img src="${img}" style="width:80%;position:absolute;top:${top*100}%;left:10%;display:block" />`
@@ -92,7 +92,7 @@ var cardsHTML = function(cards) {
     }
     html += `
     			<td style="position:relative">
-    				<img src="images/card.png" style="width:100%;display:block;visibility:hidden" />
+    				<img src="images/card.png?v=__VERSION__" style="width:100%;display:block;visibility:hidden" />
 				</td>
 			</tr>
 		</table>
@@ -106,7 +106,7 @@ var explainHTML = function(cards, cards_width, type) {
 		<table style="width:100%">
 			<tr>
 				<td style="width:${(1-cards_width)*1/5*100}%">
-                    <img src="images/help.png" style="width:50%;opacity:.75" hidden/>
+                    <img src="images/help.png?v=__VERSION__" style="width:50%;opacity:.75" hidden/>
                 </td>
 				<td style="width:${cards_width*100}%">
 					<table cellpadding=0 style="border-spacing:20px;width:100%">
@@ -120,10 +120,10 @@ var explainHTML = function(cards, cards_width, type) {
         var color = colors[card[3]-1]
         html += `
         	<td>
-        		<img src="images/${shape}.png" style="width:80%" /><br>
-        		<img src="images/${color}.png" style="width:80%" /><br>
-        		<img src="images/${texture}.png" style="width:80%" /><br>
-        		<img src="images/${num}.png" style="width:80%" />
+        		<img src="images/${shape}.png?v=__VERSION__" style="width:80%" /><br>
+        		<img src="images/${color}.png?v=__VERSION__" style="width:80%" /><br>
+        		<img src="images/${texture}.png?v=__VERSION__" style="width:80%" /><br>
+        		<img src="images/${num}.png?v=__VERSION__" style="width:80%" />
     		</td>
     		`;
     	attrs[0].add(shape)
@@ -135,11 +135,11 @@ var explainHTML = function(cards, cards_width, type) {
     for (a = 0; a < attrs.length; a++) {
     	var values = attrs[a]
     	if (values.size == 1) {
-    		img = 'images/same.png'
+    		img = 'images/same.png?v=__VERSION__'
     	} else if (values.size == 3) {
-    		img = 'images/diff.png'
+    		img = 'images/diff.png?v=__VERSION__'
     	} else {
-    		img = 'images/fail.png'
+    		img = 'images/fail.png?v=__VERSION__'
     	}
     	html += `<img src="${img}"" style="width:80%" />`
     	if (a < attrs.length - 1) {
@@ -151,7 +151,7 @@ var explainHTML = function(cards, cards_width, type) {
     					</tr>
     				</table>
                 <td style="width:${(1-cards_width)*4/5*100}%">
-	    			<img src="images/${type}.png" style="width:75%" />
+	    			<img src="images/${type}.png?v=__VERSION__" style="width:75%" />
 	    		</td>
 			</tr>
 		</table>
@@ -159,12 +159,12 @@ var explainHTML = function(cards, cards_width, type) {
 	return html
 }
 
-var makeInstruction = function({sideA, sideB='', isfirst=false, islast=false, uid=''  } = {}) {
+var makeInstruction = function({sideA, sideB='', isfirst=false, islast=false, uid='', version} = {}) {
     var html = `
         <div style="width:100vw;height:100vh;position:relative;display:table-cell;vertical-align:middle">
-            <img src="${sideA}" style="width:${80*2/3}vw;opacity:${sideB ? 1 : 1}" /><img src="${sideB}" style="width:${80*1/3}vw" />
-            <img src="${!isfirst ? 'instructions/leftkey.png' : ''}" onpointerdown=keydown("ArrowLeft") style="position:absolute;left:0;bottom:0">
-            <img id="${islast ? 'lastnext' : ''}" src="instructions/rightkey.png" onpointerdown=keydown("ArrowRight") style="position:absolute;right:0;bottom:0">
+            <img src="${sideA}?v=${version}" style="width:${80*2/3}vw;opacity:${sideB ? 1 : 1}" /><img src="${sideB ? `${sideB}?v=${version}` : ''}" style="width:${80*1/3}vw" />
+            <img src="${!isfirst ? `instructions/leftkey.png?v=${version}` : ''}" onpointerdown=keydown("ArrowLeft") style="position:absolute;left:0;bottom:0">
+            <img id="${islast ? 'lastnext' : ''}" src="instructions/rightkey.png?v=${version}" onpointerdown=keydown("ArrowRight") style="position:absolute;right:0;bottom:0">
             <p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid}</p>
         <div>
         `;

@@ -4,19 +4,19 @@
     	<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 		<title>Pequeños Maestros: Set!</title>
-        <script src="jspsych-6.0.4/jspsych.js?v=2"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js?v=1"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-instructions.js?v=3"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=1"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=4"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=1"></script>
-        <script src="auxiliary.js?v=3"></script>
-        <script src="preload_images.js?v=1"></script>
-        <link href="jspsych-6.0.4/css/jspsych.css" rel="stylesheet" type="text/css"></link>
-		<link href="style.css" rel="stylesheet">
-		<script src="secretKeyboard.js"></script>
-		<script src="fullscreen.js"></script>
-		<script src="trials.js"></script>
+        <script src="jspsych-6.0.4/jspsych.js?v=__VERSION__"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js?v=__VERSION__"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-instructions.js?v=__VERSION__"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=__VERSION__"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=__VERSION__"></script>
+        <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=__VERSION__"></script>
+        <script src="auxiliary.js?v=__VERSION__"></script>
+        <script src="preload_images.js?v=__VERSION__"></script>
+        <link href="jspsych-6.0.4/css/jspsych.css?v=__VERSION__" rel="stylesheet" type="text/css"></link>
+		<link href="style.css?v=__VERSION__" rel="stylesheet">
+		<script src="secretKeyboard.js?v=__VERSION__"></script>
+		<script src="fullscreen.js?v=__VERSION__"></script>
+		<script src="trials.js?v=__VERSION__"></script>
     </head>
     <body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;" style="cursor:none"></body>
 	<script type="module">
@@ -41,6 +41,8 @@
     	var prewarn = 60
 		// var client_ip = '<?php echo $_SERVER['REMOTE_ADDR']; ?>'
 		var client_ip = 0
+
+		var VERSION = "__VERSION__";
 
     	function Timer(user_callback, delay, prewarn) {
     		var timerId, start, remaining = (delay-prewarn)*1000;
@@ -285,7 +287,7 @@
 
 		// synchronously fetch and parse stimuli csv
 		const xhr = new XMLHttpRequest();
-		xhr.open("GET", "stimuli.csv", false); // false = synchronous
+		xhr.open("GET", `stimuli.csv?v=${VERSION}`, false); // false = synchronous
 		xhr.send();
 
 		function csvToJson(csv) {
@@ -354,7 +356,7 @@
 		var video_preloaded = false
 		if (mode == 'test') {
 			var preloadLink = document.createElement("link");
-			preloadLink.href = video;
+			preloadLink.href = `${video}?v=${VERSION}`;
 			preloadLink.rel = "preload";
 			// preloadLink.as = "video";
 			preloadLink.as = "fetch";  // Chrome-compatible alternative for video preloading
@@ -394,9 +396,9 @@
 		var uid_string = uid.toString();
 		var score = 0
 
-		var audio_correct = new Audio('sounds/correct.mp3')
-		var audio_wrong = new Audio('sounds/wrong.mp3')
-		var audio_win = new Audio('sounds/win.mp3')
+		var audio_correct = new Audio(`sounds/correct.mp3?v=${VERSION}`)
+		var audio_wrong = new Audio(`sounds/wrong.mp3?v=${VERSION}`)
+		var audio_win = new Audio(`sounds/win.mp3?v=${VERSION}`)
 
     	var fullscreen_on = {
 			type: 'fullscreen',
@@ -462,12 +464,12 @@
 
 		var known_trial = {
     		type: 'audio-keyboard-response',
-    		stimulus: 'sounds/known.mp3',
+    		stimulus: `sounds/known.mp3?v=${VERSION}`,
     		choices: ['KeyS', 'KeyN'],
     		prompt: `
     			<div style="width:100vw;height:100vh;display:table-cell;vertical-align:middle;cursor:auto">
-	    			<img src="images/known.png" style="height:25vh" /img><br>
-                    <img src="images/s_key.png" onpointerdown=keydown("KeyS") style="height:25vh;margin:5%" /><img src="images/n_key.png" onpointerdown=keydown("KeyN") style="height:25vh;margin:5%" />
+	    			<img src="images/known.png?v=__VERSION__" style="height:25vh" /img><br>
+                    <img src="images/s_key.png?v=__VERSION__" onpointerdown=keydown("KeyS") style="height:25vh;margin:5%" /><img src="images/n_key.png?v=__VERSION__" onpointerdown=keydown("KeyN") style="height:25vh;margin:5%" />
 	    			<p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid_string}</p>
     			</div>
 			`,
@@ -482,7 +484,7 @@
 			// todo: timeout
 			// todo: second time, video should not say "push next to proceed, else back to watch again"
 			type: 'video',
-			sources: ['video/proced.mp4'],
+			sources: [`video/proced.mp4?v=${VERSION}`],
 			width: 960,
 			height: 545,
 			autoplay: true,
@@ -490,7 +492,7 @@
 			uid: uid_string,
 			max_views: 2,
 			key_forward: keystrings.next,
-			audio_after: 'sounds/after.mp3',
+			audio_after: `sounds/after.mp3?v=${VERSION}`,
 			decision_timeout: video_decision_timeout*1000,
 			// disable_menu: true,
 			on_load: function() {
@@ -505,19 +507,19 @@
 			// set timeout; idem test below (I think it should be continuous, without pauses)
 			type: 'instructions',  // note we are using a custom jspsych-instructions plugin
 			pages: [
-				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, isfirst: true}),
-				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, sideB: 'instructions/page1b.jpg'}),
-				makeInstruction({sideA: 'instructions/page2a.jpg', uid: uid_string}),
-				makeInstruction({sideA: 'instructions/page2a.jpg', uid: uid_string, sideB: 'instructions/page2b.jpg'}),
-				makeInstruction({sideA: 'instructions/page3a.jpg', uid: uid_string}),
-				makeInstruction({sideA: 'instructions/page3a.jpg', uid: uid_string, sideB: 'instructions/page3b.jpg'}),
-				makeInstruction({sideA: 'instructions/page4a.jpg', uid: uid_string}),
-				makeInstruction({sideA: 'instructions/page4a.jpg', uid: uid_string, sideB: 'instructions/page4b.jpg'}),
-				makeInstruction({sideA: 'instructions/page5a.jpg', uid: uid_string}),
-				makeInstruction({sideA: 'instructions/page5a.jpg', uid: uid_string, sideB: 'instructions/page5b.jpg'}),
-				makeInstruction({sideA: 'instructions/page6a.jpg', uid: uid_string}),
-				makeInstruction({sideA: 'instructions/page6a.jpg', uid: uid_string, sideB: 'instructions/page6b.jpg'}),
-				makeInstruction({sideA: 'instructions/fin.png', uid: uid_string, islast: true})
+				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, isfirst: true, version: VERSION}),
+				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, sideB: 'instructions/page1b.jpg', version: VERSION}),
+				makeInstruction({sideA: 'instructions/page2a.jpg', uid: uid_string, version: VERSION}),
+				makeInstruction({sideA: 'instructions/page2a.jpg', uid: uid_string, sideB: 'instructions/page2b.jpg', version: VERSION}),
+				makeInstruction({sideA: 'instructions/page3a.jpg', uid: uid_string, version: VERSION}),
+				makeInstruction({sideA: 'instructions/page3a.jpg', uid: uid_string, sideB: 'instructions/page3b.jpg', version: VERSION}),
+				makeInstruction({sideA: 'instructions/page4a.jpg', uid: uid_string, version: VERSION}),
+				makeInstruction({sideA: 'instructions/page4a.jpg', uid: uid_string, sideB: 'instructions/page4b.jpg', version: VERSION}),
+				makeInstruction({sideA: 'instructions/page5a.jpg', uid: uid_string, version: VERSION}),
+				makeInstruction({sideA: 'instructions/page5a.jpg', uid: uid_string, sideB: 'instructions/page5b.jpg', version: VERSION}),
+				makeInstruction({sideA: 'instructions/page6a.jpg', uid: uid_string, version: VERSION}),
+				makeInstruction({sideA: 'instructions/page6a.jpg', uid: uid_string, sideB: 'instructions/page6b.jpg', version: VERSION}),
+				makeInstruction({sideA: 'instructions/fin.png', uid: uid_string, islast: true, version: VERSION})
 			],
 			allow_keys: true,
 			// key_forward: uid >= 500 && uid < 600 ? 'PageDown' : null,
@@ -700,7 +702,7 @@
 		    	data.trial_num = trial_num,
 		    	data.ts_end = Date.now()
 		    },
-		    preload_images: preload,
+		    preload_images: preload.map(img => `${img}?v=${VERSION}`),
 	      	on_interaction_data_update: function(data) {
     			data.ts_start = Date.now(),
     			data.trial_num = trial_num
