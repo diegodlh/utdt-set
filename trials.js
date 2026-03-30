@@ -1,10 +1,10 @@
 function trialType(card1, card2, card3) {
     if (
-        card1.length != 4 ||
-        card2.length != 4 ||
-        card3.length != 4
+        !isValidCard(card1) ||
+        !isValidCard(card2) ||
+        !isValidCard(card3)
     ) {
-        throw new Error("One or more cards are not length=4!");
+        throw new Error("One or more cards are invalid!");
     }
     let sameMask = 0;
     let brokenMask = 0;
@@ -23,6 +23,16 @@ function trialType(card1, card2, card3) {
     } else {
         return -brokenMask;
     }
+}
+
+function isValidCard(card) {
+    if (card.length != 4) {
+        return false;
+    }
+    if ([...card].some(value => !["1", "2", "3"].includes(String(value)))) {
+        return false;
+    }
+    return true;
 }
 
 /**

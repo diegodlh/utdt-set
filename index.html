@@ -314,6 +314,19 @@
 				"type": stimulus.type,
 				"explain": stimulus.explain > 0 ? true : false
 			}
+			const cards = [stimulus.card1, stimulus.card2, stimulus.card3];
+			if (cards.some(Boolean)) {
+				try {
+					const type = trialType(...cards);
+					if (type == stimulus.type) {
+						stimuli[stimulus.id][trial_idx]["cards"] = cards
+					} else {
+						console.error(`Trial ${trial_idx+1} of ID ${stimulus.id}: inferred type ${type} does not match specified type ${stimulus.type}.`);
+					}
+				} catch (err) {
+					console.error(`Failed processing cards for trial ${trial_idx+1} of ID ${stimulus.id}: ${err}`);
+				}
+			}
 		}
 		// check for, warn and fill any gaps in the trial sequences
 		for (const  [id, trials] of Object.entries(stimuli)) {
@@ -378,6 +391,9 @@
 		const allTrials = generateAllTrials();
 
 		for (const trial of trials) {
+			if (trial.cards) {
+				continue;  // do not overwrite manually specified cards
+			}
 			const typeTrials = allTrials[trial.type];
 			// randomly pick one set of three cards matching the trial type
 			const cards = typeTrials[Math.floor(Math.random() * typeTrials.length)];
