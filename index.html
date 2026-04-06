@@ -10,6 +10,7 @@
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=__VERSION__"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=__VERSION__"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=__VERSION__"></script>
+		<script src="jspsych-6.0.4/plugins/jspsych-call-function.js?v=__VERSION__"></script>
         <script src="auxiliary.js?v=__VERSION__"></script>
         <script src="preload_images.js?v=__VERSION__"></script>
         <link href="jspsych-6.0.4/css/jspsych.css?v=__VERSION__" rel="stylesheet" type="text/css"></link>
@@ -233,40 +234,44 @@
 			}
 		}
 
-		var endExperiment = function(event) {
+		var endExperimentListener = function(event) {
 			if(
 				event.key.toLowerCase() == 'q'
 				&& event.ctrlKey
 				&& event.altKey
 			) {
-					// prevent default browser behavior for key combination
-					event.preventDefault()
-					event.stopPropagation()
+				// prevent default browser behavior for key combination
+				event.preventDefault()
+				event.stopPropagation()
 
-					if (timer) {
-						timer.clear();
-						timer = null;
-					};
-					removeTimeWarning();
-					jsPsych.endCurrentTimeline()  // exits instructions loop to avoid confirmation prompt
-					jsPsych.pauseExperiment()  // prevent next trial from loading after finishing current trial
-					jsPsych.finishTrial()
-					setTimeout(saveData, 100)
-					jsPsych.endExperiment(`
-						<p>La sesión ha finalizado.</p>
-						<p style="position:absolute;bottom:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">
-							${uid_string}
-						</p>
-						`
-					)
-					jsPsych.resumeExperiment()
-					window.removeEventListener('keydown', endExperiment)
-					window.removeEventListener('resize', onresizeFunction)
-					window.removeEventListener('beforeunload', beforeunload)
+				endExperiment()
 			}
 		}
 
-		window.addEventListener('keydown', endExperiment)
+		var endExperiment = function() {
+			if (timer) {
+				timer.clear();
+				timer = null;
+			};
+			removeTimeWarning();
+			jsPsych.endCurrentTimeline()  // exits instructions loop to avoid confirmation prompt
+			jsPsych.pauseExperiment()  // prevent next trial from loading after finishing current trial
+			jsPsych.finishTrial()
+			setTimeout(saveData, 100)
+			jsPsych.endExperiment(`
+				<p>La sesión ha finalizado.</p>
+				<p style="position:absolute;bottom:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">
+					${uid_string}
+				</p>
+				`
+			)
+			jsPsych.resumeExperiment()
+			window.removeEventListener('keydown', endExperimentListener)
+			window.removeEventListener('resize', onresizeFunction)
+			window.removeEventListener('beforeunload', beforeunload)
+		}
+
+		window.addEventListener('keydown', endExperimentListener)
 
 		// HACKY
 		// Check localStorage for s3ClientConfig and ask for it if needed
@@ -354,20 +359,20 @@
     		var uid = window.prompt('uid:', '')    		
 		}
 
-		var modes = ['test', 'retest']
+		var modes = ['test', 'retest', 'instruct', 'instruct-rt']
 		var mode = urlParams.get('mode')
 		while (true) {
 			if (mode) {
 				if (modes.includes(mode)) { break }
 			}
-			let mode_choice = window.prompt('1 (test) / 2 (retest):', '');
+			let mode_choice = window.prompt('1 (test) / 2 (retest) / 3 (instruct) / 4 (instruct-rt):', '');
 			mode = modes[mode_choice - 1];
 		}
 
-		// only if mode is test, preloads the video file
+		// only if mode is not instruct, preloads the video file
 		var video = 'video/proced.mp4'
 		var video_preloaded = false
-		if (mode == 'test') {
+		if (mode != 'instruct') {
 			var preloadLink = document.createElement("link");
 			preloadLink.href = `${video}?v=${VERSION}`;
 			preloadLink.rel = "preload";
@@ -378,7 +383,7 @@
 		}
 
 		var stylesheet = document.createElement('style')
-	    stylesheet.innerHTML = `#holdscreen {background-color:${mode=='test' ? 'red' : '#AAA'};}`
+	    stylesheet.innerHTML = `#holdscreen {background-color:${mode!='instruct' ? 'red' : '#AAA'};}`
 	    stylesheet = document.head.appendChild(stylesheet)
 		var onVideoPreload = function() {
 			video_preloaded = true
@@ -448,8 +453,8 @@
 						event.preventDefault()
 						event.stopPropagation()
 
-						if (mode != 'test' || video_preloaded) {
-							// if in test mode, hold screen can only be closed if video has been preloaded successfully
+						if (mode == 'instruct' || video_preloaded) {
+							// if not in instruct mode, hold screen can only be closed if video has been preloaded successfully
 							jsPsych.finishTrial( {'key_press': 'ctrl+alt+s'} )
 							window.removeEventListener('keydown', _listener)
 						} else {
@@ -682,7 +687,7 @@
 				removeTimeWarning()
 				audio_win.play()
 				setTimeout(saveData, 100)
-				window.removeEventListener('keydown', endExperiment);
+				window.removeEventListener('keydown', endExperimentListener);
 				window.removeEventListener('resize', onresizeFunction)
 				window.removeEventListener('beforeunload', beforeunload)
 			},
@@ -690,18 +695,47 @@
 			data: {}
 		}
 
-		// var timeline = [fullscreen_on]  // going fullscreen with the fullscreen plugin causes js dialogs to exit fullscreen mode
-		var timeline = [hold]
-		if (mode == 'retest') {
-			timeline.push(instructions_loop)
-		} else if (mode == 'test') {
-			timeline.push(known_trial)
-			timeline.push(video_trial)
+		var end = {
+			type: "call-function",
+			data: {},
+			func: endExperiment
 		}
-		timeline.push(test, winner)
+
+		// var timeline = [fullscreen_on]  // going fullscreen with the fullscreen plugin causes js dialogs to exit fullscreen mode
+		let timeline
+		if (mode == "test") {
+			timeline = [
+				hold,
+				// known_trial,
+				// video_trial,
+				test,
+				winner
+			];
+		} else if (mode == "retest") {
+			timeline = [
+				hold,
+				video_trial,
+				test,
+				winner
+			]
+		} else if (mode == "instruct") {
+			timeline = [
+				hold,
+				instructions_loop,
+				end
+			]
+		} else if (mode == "instruct-rt") {
+			timeline = [
+				hold,
+				instructions_loop,
+				video_trial,
+				test,
+				winner
+			]
+		}
 
 		var preload = [...preload_images]
-    	if (mode == 'retest') {
+    	if (timeline.includes(instructions_loop)) {
     		preload.push(...preload_instructions)
     	}
     	preload.push('images/known.png', 'images/s_key.png', 'images/n_key.png')
