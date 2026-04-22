@@ -119,6 +119,7 @@ jsPsych.plugins.video = (function() {
 
     // display stimulus
     var video_html = '<video id="jspsych-video-player" width="'+trial.width+'" height="'+trial.height+'" '
+    video_html += "disableRemotePlayback ";
     if(trial.autoplay){
       video_html += "autoplay "
     }
