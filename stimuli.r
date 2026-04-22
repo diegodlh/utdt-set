@@ -4,20 +4,20 @@ ids <- read.csv("IDs.csv")[[1]] |>
   str_subset("PA9|PB9|SA9|SB9|PA10|PB10|PC10|SA10|SB10", negate = TRUE)
 ids <- c(
   ids,
-  "RM-00",
-  "RM-01",
-  "RM-02",
-  "RM-03",
-  "RM-04",
-  "RA-01",
-  "RA-02",
-  "RA-03",
-  "RA-04",
-  "RA-05",
-  "RA-06",
-  "RA-07",
-  "RA-08",
-  "RA-09"
+  "rm00",
+  "rm01",
+  "rm02",
+  "rm03",
+  "rm04",
+  "ra01",
+  "ra02",
+  "ra03",
+  "ra04",
+  "ra05",
+  "ra06",
+  "ra07",
+  "ra08",
+  "ra09"
 )
 
 trial_dict <- read.csv("trials.csv", colClasses = "character") |>
@@ -25,15 +25,15 @@ trial_dict <- read.csv("trials.csv", colClasses = "character") |>
     mutate(Replaced = rep(FALSE, nrow(.)))
 
 out_df <- data.frame(
-  Id=character(),
-  Trial=integer(),
-  Type=integer(),
-  Explain=integer(),
-  Card1=character(),
-  Card2=character(),
-  Card3=character(),
-  TrialId=integer(),
-  Memory=integer()
+  id=character(),
+  trial=integer(),
+  type=integer(),
+  explain=integer(),
+  card1=character(),
+  card2=character(),
+  card3=character(),
+  trialid=integer(),
+  memory=integer()
 )
 
 block_mask_replace_paired <- function(df1, df2, block_size = 5) {
@@ -83,9 +83,9 @@ block_mask_replace_paired <- function(df1, df2, block_size = 5) {
 
 for (id in ids) {
   ID <- c(
-    rep(paste0(id, "_pre"), 24),
-    rep(paste0(id, "_post"), 24),
-    rep(paste0(id, "_retest"), 24)
+    rep(paste0(id, ".a"), 24),
+    rep(paste0(id, ".b"), 24),
+    rep(paste0(id, ".c"), 24)
   )
   TRIAL <- rep(1:24, 3)
   EXPLAIN <-  rep(c(rep(1, 4), c(rep(0, 20))), 3)
@@ -104,7 +104,7 @@ for (id in ids) {
   )
 
   p3 <- slice_sample(
-    filter(trial_dict, Type == -14),
+    filter(trial_dict, Type == 14),
     n = 3
   )
 
@@ -221,8 +221,8 @@ for (id in ids) {
         slice(b31, 1),
         slice(b32, 1),
         slice(d4, 3),
-        slice(b13, 1),
-        slice(b14, 1),
+        slice(b33, 1),
+        slice(b34, 1),
       ),
       prop = 1
     ),
@@ -252,8 +252,8 @@ for (id in ids) {
     slice(b31, 2),
     slice(b32, 2),
     slice(d4, 7),
-    slice(b13, 2),
-    slice(b14, 2),
+    slice(b33, 2),
+    slice(b34, 2),
     slice(b41, 2),
     slice(b42, 2),
     slice(d4, 8),
@@ -275,8 +275,8 @@ for (id in ids) {
     slice(b31, 3),
     slice(b32, 3),
     slice(d4, 11),
-    slice(b13, 3),
-    slice(b14, 3),
+    slice(b33, 3),
+    slice(b34, 3),
     slice(b41, 3),
     slice(b42, 3),
     slice(d4, 12),
@@ -343,17 +343,17 @@ for (id in ids) {
   trial_rows[, 2:4] <- t(apply(trial_rows[, 2:4], 1, sample))
 
   trials_df <- data.frame(
-    Id=ID,
-    Trial=TRIAL,
-    Type=trial_rows$Type,
-    Explain=EXPLAIN,
-    Card1=trial_rows$Card1,
-    Card2=trial_rows$Card2,
-    Card3=trial_rows$Card3,
-    TrialId=trial_rows$Trial_id,
-    Memory=as.integer(trial_rows$Replaced)
+    id=ID,
+    trial=TRIAL,
+    type=trial_rows$Type,
+    explain=EXPLAIN,
+    card1=trial_rows$Card1,
+    card2=trial_rows$Card2,
+    card3=trial_rows$Card3,
+    trialid=trial_rows$Trial_id,
+    memory=as.integer(trial_rows$Replaced)
   )
   out_df <- rbind(out_df, trials_df)
 }
 
-write_csv(out_df, "stimuli.csv", append = TRUE)
+write_csv(out_df, "stimuli.csv", append = FALSE)
