@@ -742,6 +742,7 @@
 
 		jsPsych.init({
 		    timeline: timeline,
+			use_webaudio: false,
 		    on_trial_start: function(trial) {
 				trial.data.client_ip = client_ip;
 				trial.data.navigator = navigator.userAgent;

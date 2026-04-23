@@ -2370,7 +2370,10 @@ jsPsych.pluginAPI = (function() {
       loaded++;
       if(progress_bar){
         var percent_loaded = (loaded/total_n)*100;
-        jsPsych.getDisplayElement().querySelector('#jspsych-loading-progress-bar').style.width = percent_loaded+"%";
+        var bar = jsPsych.getDisplayElement().querySelector('#jspsych-loading-progress-bar');
+        if (bar) {
+          bar.style.width = percent_loaded+"%";
+        }
       }
     }
 
