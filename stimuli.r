@@ -1,24 +1,32 @@
 library(tidyverse)
 
-ids <- read.csv("IDs.csv")[[1]] |>
-  str_subset("PA9|PB9|SA9|SB9|PA10|PB10|PC10|SA10|SB10", negate = TRUE)
+# ids <- read.csv("IDs.csv")[[1]] |>
+#   str_subset("PA9|PB9|SA9|SB9|PA10|PB10|PC10|SA10|SB10", negate = TRUE)
+# ids <- c(
+#   ids,
+#   "rm00",
+#   "rm01",
+#   "rm02",
+#   "rm03",
+#   "rm04",
+#   "ra01",
+#   "ra02",
+#   "ra03",
+#   "ra04",
+#   "ra05",
+#   "ra06",
+#   "ra07",
+#   "ra08",
+#   "ra09"
+# )
+
 ids <- c(
-  ids,
-  "rm00",
-  "rm01",
-  "rm02",
-  "rm03",
-  "rm04",
-  "ra01",
-  "ra02",
-  "ra03",
-  "ra04",
-  "ra05",
-  "ra06",
-  "ra07",
-  "ra08",
-  "ra09"
+  "sb6.14",
+  "pb6.17",
+  "pb6.18",
+  "pb6.19"
 )
+
 
 trial_dict <- read.csv("trials.csv", colClasses = "character") |>
   rownames_to_column(var = "Trial_id") %>%
@@ -356,4 +364,4 @@ for (id in ids) {
   out_df <- rbind(out_df, trials_df)
 }
 
-write_csv(out_df, "stimuli.csv", append = FALSE)
+write_csv(out_df, "stimuli.csv", append = TRUE)
