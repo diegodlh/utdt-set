@@ -1,63 +1,43 @@
 library(tidyverse)
+library(googlesheets4)
 
-ids <- c(
-  "pa4.01",
-  "pa4.02",
-  "pa4.03",
-  "pa4.04",
-  "pa4.05",
-  "pa4.06",
-  "pa4.07",
-  "pa4.08",
-  "pa4.09",
-  "pa4.10",
-  "pa4.11",
-  "pa4.12",
-  "sa4.13",
-  "sa4.14",
-  "sa4 15",
-  "pb4.01",
-  "pb4.02",
-  "pb4.03",
-  "sb4.01",
-  "sb4.04",
-  "sb4.05",
-  "sb4.06",
-  "sb4.07",
-  "sb4.08",
-  "sb4.09",
-  "sb4.11",
-  "pc4.01",
-  "pc4.02",
-  "pc4.03",
-  "pc4.04",
-  "pc4.05",
-  "pc4.06",
-  "pc4.07",
-  "pc4.08",
-  "pc4.09",
-  "pc4.10",
-  "pc4.11",
-  "pc4.12",
-  "pc4.13",
-  "se7.11"
-)
+stimuli <- read.csv("stimuli.csv")
+uids <- unique(str_remove(stimuli$id, "\\.[a-z]$"))
+gs4_auth()
+pm <- read_sheet(
+  "https://docs.google.com/spreadsheets/d/1Ha8zeFRzT2Dh0jwQm5Y_6mvoSLtQfAsQ5pb-qlBlJkI/edit?gid=0",
+  sheet = "PM"
+) |> slice(1:600)
+ids <- pm$UID[!pm$UID %in% uids]
 
-
+for (i in c(
+  "pa5", "pb5", "pc5", "pd5", "pe5",
+  "sa5", "sb5", "sc5", "sd5", "se5",
+  "pa9", "pb9", "pc9", "pd9", "pe9",
+  "sa9", "sb9", "sc9", "sd9", "se9",
+  "pa10", "pb10", "pc10", "pd10", "pe10",
+  "sa10", "sb10", "sc10", "sd10", "se10",
+  "pa11", "pb11",
+  "sa11", "sb11", "sc11"
+)){
+  for (j in seq_len(30)){
+    ids <- c(ids, paste0(i, ".", sprintf("%02d", j)))
+  }
+}
 trial_dict <- read.csv("trials.csv", colClasses = "character") |>
   rownames_to_column(var = "Trial_id") %>%
   mutate(Replaced = rep(FALSE, nrow(.)))
 
 out_df <- data.frame(
-  id=character(),
-  trial=integer(),
-  type=integer(),
-  explain=integer(),
-  card1=character(),
-  card2=character(),
-  card3=character(),
-  trialid=integer(),
-  memory=integer()
+  id = character(),
+  trial = integer(),
+  type = integer(),
+  explain = integer(),
+  card1 = character(),
+  card2 = character(),
+  card3 = character(),
+  trialid = integer(),
+  memory = integer()
 )
 
 block_mask_replace_paired <- function(df1, df2, block_size = 5) {
@@ -66,42 +46,36 @@ block_mask_replace_paired <- function(df1, df2, block_size = 5) {
   if (nrow(df1) %% (block_size * 2) != 0) {
     stop("Total rows must be divisible by (block_size * 2) for counterbalancing.")
   }
-  
+
   n_rows <- nrow(df1)
   n_blocks <- n_rows / block_size
-  
   # Initialize markers
   df1$Replaced <- FALSE
   df2$Replaced <- FALSE
-  
   # Define the two possible sizes for an odd block
   low_n <- floor(block_size / 2)  # e.g., 2
   high_n <- ceiling(block_size / 2) # e.g., 3
-  
   # 1. Create counterbalanced sample sizes
   # We iterate by 2 blocks at a time
   sample_sizes <- numeric(n_blocks)
+
   for (i in seq(1, n_blocks, by = 2)) {
     # Randomly assign which block in the pair gets the 'high_n'
     pair_sizes <- sample(c(low_n, high_n))
     sample_sizes[i] <- pair_sizes[1]
     sample_sizes[i + 1] <- pair_sizes[2]
   }
-  
   # 2. Generate mask indices
   mask_indices <- unlist(lapply(1:n_blocks, function(i) {
     block_start <- ((i - 1) * block_size) + 1
     block_end <- i * block_size
     sample(block_start:block_end, sample_sizes[i])
   }))
-  
   # 3. Apply replacement logic
   cols_to_copy <- setdiff(names(df1), "Replaced")
-  
   df2[mask_indices, "Replaced"] <- TRUE
   df1[mask_indices, "Replaced"] <- TRUE
   df2[mask_indices, cols_to_copy] <- df1[mask_indices, cols_to_copy]
-  
   return(list(df1 = df1, df2 = df2))
 }
 
@@ -121,22 +95,18 @@ for (id in ids) {
     filter(trial_dict, Type == 15),
     n = 3
   )
-  
   p2 <- slice_sample(
     filter(trial_dict, Type == -1),
     n = 3
   )
-
   p3 <- slice_sample(
     filter(trial_dict, Type == 14),
     n = 3
   )
-
   p4 <- slice_sample(
     filter(trial_dict, Type == -11),
     n = 3
   )
-
   d4 <- slice_sample(
     filter(trial_dict, Type == 0),
     n = 12
@@ -159,7 +129,6 @@ for (id in ids) {
     filter(trial_dict, Type == -8),
     n = 3
   )
-  
   # Bloque de evaluación 2 -> Set 1-diferente color, Set 3-diferente forma, Set 4-diferente tipo único, NoSet 3-roto forma y NoSet 1-roto color (orden aleatorio)
   # 14; 4; 0; -11; -1
   b21 <- slice_sample(
@@ -318,19 +287,19 @@ for (id in ids) {
     slice(p3, 2),
     slice(p4, 2),
     slice_sample(
-        slice(masked_blocks[[1]], 1:5),
+      slice(masked_blocks[[1]], 1:5),
       prop = 1
     ),
     slice_sample(
-        slice(masked_blocks[[1]], 6:10),
+      slice(masked_blocks[[1]], 6:10),
       prop = 1
     ),
     slice_sample(
-        slice(masked_blocks[[1]], 11:15),
+      slice(masked_blocks[[1]], 11:15),
       prop = 1
     ),
     slice_sample(
-        slice(masked_blocks[[1]], 16:20),
+      slice(masked_blocks[[1]], 16:20),
       prop = 1
     )
   )
@@ -341,19 +310,19 @@ for (id in ids) {
     slice(p3, 3),
     slice(p4, 3),
     slice_sample(
-        slice(masked_blocks[[2]], 1:5),
+      slice(masked_blocks[[2]], 1:5),
       prop = 1
     ),
     slice_sample(
-        slice(masked_blocks[[2]], 6:10),
+      slice(masked_blocks[[2]], 6:10),
       prop = 1
     ),
     slice_sample(
-        slice(masked_blocks[[2]], 11:15),
+      slice(masked_blocks[[2]], 11:15),
       prop = 1
     ),
     slice_sample(
-        slice(masked_blocks[[2]], 16:20),
+      slice(masked_blocks[[2]], 16:20),
       prop = 1
     )
   )
@@ -362,20 +331,20 @@ for (id in ids) {
     pre,
     post,
     retest
-  ) 
-  
+  )
+
   trial_rows[, 2:4] <- t(apply(trial_rows[, 2:4], 1, sample))
 
   trials_df <- data.frame(
-    id=ID,
-    trial=TRIAL,
-    type=trial_rows$Type,
-    explain=EXPLAIN,
-    card1=trial_rows$Card1,
-    card2=trial_rows$Card2,
-    card3=trial_rows$Card3,
-    trialid=trial_rows$Trial_id,
-    memory=as.integer(trial_rows$Replaced)
+    id = ID,
+    trial = TRIAL,
+    type = trial_rows$Type,
+    explain = EXPLAIN,
+    card1 = trial_rows$Card1,
+    card2 = trial_rows$Card2,
+    card3 = trial_rows$Card3,
+    trialid = trial_rows$Trial_id,
+    memory = as.integer(trial_rows$Replaced)
   )
   out_df <- rbind(out_df, trials_df)
 }
