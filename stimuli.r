@@ -24,6 +24,11 @@ for (i in c(
     ids <- c(ids, paste0(i, ".", sprintf("%02d", j)))
   }
 }
+
+length(ids)
+ids <- ids[!ids %in% uids]
+length(ids)
+
 trial_dict <- read.csv("trials.csv", colClasses = "character") |>
   rownames_to_column(var = "Trial_id") %>%
   mutate(Replaced = rep(FALSE, nrow(.)))
@@ -46,7 +51,7 @@ block_mask_replace_paired <- function(df1, df2, block_size = 5) {
   if (nrow(df1) %% (block_size * 2) != 0) {
     stop("Total rows must be divisible by (block_size * 2) for counterbalancing.")
   }
-
+  
   n_rows <- nrow(df1)
   n_blocks <- n_rows / block_size
   # Initialize markers
