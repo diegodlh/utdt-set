@@ -20,18 +20,6 @@
 		<script src="trials.js?v=__VERSION__"></script>
     </head>
     <body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;" style="cursor:none"></body>
-	<script type="module">
-		import { S3Client } from "./esm.sh/jsr/@bradenmacdonald/s3-lite-client@0.9.5.js";
-
-		const s3ClientConfig = JSON.parse(
-			localStorage.getItem("s3ClientConfig")
-		);
-		try {
-			window.s3Client = new S3Client(s3ClientConfig);
-		} catch (err) {
-			console.error("Could not initialize S3 Client: " + err);
-		}
-	</script>
     <script>
 
     	var tmin_instructions = 200
@@ -186,40 +174,15 @@
 				}, 0)
 			}
 
-			async function saveRemote(filename, csvdata) {
-				while(true) {
-					console.log(`Trying to save ${filename} remotely...`);
-					try {
-						response = await s3Client.putObject(
-							filename,
-							csvdata
-						);
-						console.log(filename + ' successfully saved to server.')
-						break
-					} catch (err) {					
-						if (!window.confirm(filename + ' could not be saved to server. Try again?')) {
-							// saveLocal(filename, csvdata);
-							break
-						}
-					}
-				}
-				console.log(`Saving ${filename} locally...`)
-				saveLocal(filename, csvdata);
-			}
-
 			var basename = (
 				`${uid_string}_${mode}_${jsPsych.startTime().toISOString()}`
 			);
 
-			// saveLocal()
-			// saveLocal()
 			const data = {
 				"data": jsPsych.data.get().ignore('stimulus').values(),
 				"intdata": jsPsych.data.getInteractionData().values()
 			}
-			saveRemote('data_' + basename + '.json', JSON.stringify(data, null, 2));
-			// saveRemote('data_' + basename + '.csv', jsPsych.data.get().ignore('stimulus').csv())
-			// saveRemote('intdata_' + basename + '.csv', jsPsych.data.getInteractionData().csv())
+			saveLocal('data_' + basename + '.json', JSON.stringify(data, null, 2));
 		};
 
 		var keydown = function(keystring) {
@@ -272,23 +235,6 @@
 		}
 
 		window.addEventListener('keydown', endExperimentListener)
-
-		// HACKY
-		// Check localStorage for s3ClientConfig and ask for it if needed
-		// before any other prompts are shown
-		if (!localStorage.getItem("s3ClientConfig")) {
-			const s3ClientConfigString = prompt("S3 Client Config:");
-			if (s3ClientConfigString) {
-				try {
-					s3ClientConfig = JSON.parse(s3ClientConfigString);
-					// TODO: validate config string?
-					localStorage.setItem("s3ClientConfig", s3ClientConfigString);
-				} catch (err) {
-					console.error("Could not save S3 Client Config: " + err);
-				}
-				
-			}
-		}
 
 		// synchronously fetch and parse stimuli csv
 		const xhr = new XMLHttpRequest();
