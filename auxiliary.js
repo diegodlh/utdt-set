@@ -158,15 +158,3 @@ var explainHTML = function(cards, cards_width, type) {
 		`;
 	return html
 }
-
-var makeInstruction = function({sideA, sideB='', isfirst=false, islast=false, uid='', version} = {}) {
-    var html = `
-        <div style="width:100vw;height:100vh;position:relative;display:table-cell;vertical-align:middle">
-            <img src="${sideA}?v=${version}" style="width:${80*2/3}vw;opacity:${sideB ? 1 : 1}" /><img src="${sideB ? `${sideB}?v=${version}` : ''}" style="width:${80*1/3}vw" />
-            <img src="${!isfirst ? `instructions/leftkey.png?v=${version}` : ''}" onpointerdown=keydown("ArrowLeft") style="position:absolute;left:0;bottom:0">
-            <img id="${islast ? 'lastnext' : ''}" src="instructions/rightkey.png?v=${version}" onpointerdown=keydown("ArrowRight") style="position:absolute;right:0;bottom:0">
-            <p style="position:absolute;top:0;right:10px;margin:0;font-size:2.5vh;line-height:normal">${uid}</p>
-        <div>
-        `;
-    return html
-}

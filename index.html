@@ -6,7 +6,6 @@
 		<title>Pequeños Maestros: Set!</title>
         <script src="jspsych-6.0.4/jspsych.js?v=__VERSION__"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-html-keyboard-response.js?v=__VERSION__"></script>
-        <script src="jspsych-6.0.4/plugins/jspsych-instructions.js?v=__VERSION__"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-fullscreen.js?v=__VERSION__"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-video.js?v=__VERSION__"></script>
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=__VERSION__"></script>
@@ -22,8 +21,6 @@
     <body oncontextmenu="return false;" ondragstart="return false;" onselectstart="return false;" style="cursor:none"></body>
     <script>
 
-    	var tmin_instructions = 200
-    	var timeout_instructions = 600
     	var timeout_game = 600
     	var timeout_known = 60
     	var video_decision_timeout = 30
@@ -305,31 +302,20 @@
     		var uid = window.prompt('uid:', '')    		
 		}
 
-		var modes = ['test', 'retest', 'instruct', 'instruct-rt']
-		var mode = urlParams.get('mode')
-		while (true) {
-			if (mode) {
-				if (modes.includes(mode)) { break }
-			}
-			let mode_choice = window.prompt('1 (test) / 2 (retest) / 3 (instruct) / 4 (instruct-rt):', '');
-			mode = modes[mode_choice - 1];
-		}
+		var mode = 'test'
 
-		// only if mode is not instruct, preloads the video file
 		var video = 'video/proced.mp4'
 		var video_preloaded = false
-		if (mode != 'instruct') {
-			var preloadLink = document.createElement("link");
-			preloadLink.href = `${video}?v=${VERSION}`;
-			preloadLink.rel = "preload";
-			// preloadLink.as = "video";
-			preloadLink.as = "fetch";  // Chrome-compatible alternative for video preloading
-			preloadLink.setAttribute("onload", "onVideoPreload()");
-			document.head.appendChild(preloadLink);
-		}
+		var preloadLink = document.createElement("link");
+		preloadLink.href = `${video}?v=${VERSION}`;
+		preloadLink.rel = "preload";
+		// preloadLink.as = "video";
+		preloadLink.as = "fetch";  // Chrome-compatible alternative for video preloading
+		preloadLink.setAttribute("onload", "onVideoPreload()");
+		document.head.appendChild(preloadLink);
 
 		var stylesheet = document.createElement('style')
-	    stylesheet.innerHTML = `#holdscreen {background-color:${mode!='instruct' ? 'red' : '#AAA'};}`
+	    stylesheet.innerHTML = `#holdscreen {background-color:red};}`
 	    stylesheet = document.head.appendChild(stylesheet)
 		var onVideoPreload = function() {
 			video_preloaded = true
@@ -399,28 +385,14 @@
 						event.preventDefault()
 						event.stopPropagation()
 
-						if (mode == 'instruct' || video_preloaded) {
-							// if not in instruct mode, hold screen can only be closed if video has been preloaded successfully
+						if (video_preloaded) {
+							// hold screen can only be closed if video has been preloaded successfully
 							jsPsych.finishTrial( {'key_press': 'ctrl+alt+s'} )
 							window.removeEventListener('keydown', _listener)
 						} else {
 							window.alert(video + ' not preloaded!')
 						}
 					}
-					var last_trial = jsPsych.data.getLastTrialData().values()[0]
-					if (
-						last_trial && last_trial.trial_type == 'instructions' &&
-						event.key.toLowerCase() == 'r'
-						&& event.ctrlKey
-						&& event.altKey
-					) {
-						// prevent default browser behavior for key combination
-						event.preventDefault()
-						event.stopPropagation()
-
-						jsPsych.finishTrial( {'key_press': 'ctrl+alt+r'} );
-						window.removeEventListener('keydown', _listener);
-					};
 				});
 				document.getElementById("holdscreen").style.fontSize = (
 					100 / (uid_string.length + 1) / 0.6 + "vw"
@@ -469,86 +441,6 @@
 			},
 			data: {}
 		}
-
-		var instructions = {
-			// set timeout; idem test below (I think it should be continuous, without pauses)
-			type: 'instructions',  // note we are using a custom jspsych-instructions plugin
-			pages: [
-				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, isfirst: true, version: VERSION}),
-				makeInstruction({sideA: 'instructions/page1a.jpg', uid: uid_string, sideB: 'instructions/page1b.jpg', version: VERSION}),
-				makeInstruction({sideA: 'instructions/page2a.jpg', uid: uid_string, version: VERSION}),
-				makeInstruction({sideA: 'instructions/page2a.jpg', uid: uid_string, sideB: 'instructions/page2b.jpg', version: VERSION}),
-				makeInstruction({sideA: 'instructions/page3a.jpg', uid: uid_string, version: VERSION}),
-				makeInstruction({sideA: 'instructions/page3a.jpg', uid: uid_string, sideB: 'instructions/page3b.jpg', version: VERSION}),
-				makeInstruction({sideA: 'instructions/page4a.jpg', uid: uid_string, version: VERSION}),
-				makeInstruction({sideA: 'instructions/page4a.jpg', uid: uid_string, sideB: 'instructions/page4b.jpg', version: VERSION}),
-				makeInstruction({sideA: 'instructions/page5a.jpg', uid: uid_string, version: VERSION}),
-				makeInstruction({sideA: 'instructions/page5a.jpg', uid: uid_string, sideB: 'instructions/page5b.jpg', version: VERSION}),
-				makeInstruction({sideA: 'instructions/page6a.jpg', uid: uid_string, version: VERSION}),
-				makeInstruction({sideA: 'instructions/page6a.jpg', uid: uid_string, sideB: 'instructions/page6b.jpg', version: VERSION}),
-				makeInstruction({sideA: 'instructions/fin.png', uid: uid_string, islast: true, version: VERSION})
-			],
-			allow_keys: true,
-			// key_forward: uid >= 500 && uid < 600 ? 'PageDown' : null,
-			// key_backward: uid >= 500 && uid < 600 ? 'PageUp' : null,
-			allow_backward: true,
-			show_clickable_nav: false,
-			tmin: function() {
-				if (jsPsych.data.get().filter({trial_type: 'instructions'}).count()) {
-					return 0
-				} else { return tmin_instructions }
-			},
-			data: {},
-		}
-
-		var instructions_loop = {
-			// loops over the instructions until a researcher enters the key to proceed
-			timeline: [instructions, hold],
-			loop_function: function() {
-				var key_press = jsPsych.data.getLastTrialData().values()[0].key_press
-				if (key_press == 'ctrl+alt+s') {
-					if (timer) {
-						timer.clear()
-						timer = null
-					}
-					removeTimeWarning();
-					return false
-				} else if (key_press == 'ctrl+alt+r') {
-					return true
-				} else {
-					console.log('unexpected key_press value')
-				};
-				// while(true) {
-				// 	if (timer) { timer.background() }
-				// 	var clave = window.prompt('Ingrese la clave para continuar:')
-				// 	if(clave == 'continuar') {
-				// 		if (timer) {
-				// 			timer.clear()
-				// 			timer = null
-				// 		}
-				// 		removeTimeWarning()
-				// 		return false
-				// 	} else { 
-				// 		if (timer) { timer.foreground() }
-				// 		return true
-				// 	}
-				// }
-			},
-			on_load: function() {
-				if (!timer) {
-					timer = new Timer(function() {
-						timer = null
-						removeTimeWarning();
-						jsPsych.endCurrentTimeline()
-						jsPsych.finishTrial()
-						while(true) {
-							var clave = window.prompt('El tiempo se agotó. Ingrese la clave para continuar:')
-							if (clave == 'continuar') { break }
-						};
-					}, timeout_instructions, prewarn)
-				};
-			}
-		};
 
 		var cards = {
 			type: 'html-keyboard-response',
@@ -648,42 +540,15 @@
 		}
 
 		// var timeline = [fullscreen_on]  // going fullscreen with the fullscreen plugin causes js dialogs to exit fullscreen mode
-		let timeline
-		if (mode == "test") {
-			timeline = [
-				hold,
-				known_trial,
-				video_trial,
-				test,
-				winner
-			];
-		} else if (mode == "retest") {
-			timeline = [
-				hold,
-				video_trial,
-				test,
-				winner
-			]
-		} else if (mode == "instruct") {
-			timeline = [
-				hold,
-				instructions_loop,
-				end
-			]
-		} else if (mode == "instruct-rt") {
-			timeline = [
-				hold,
-				instructions_loop,
-				video_trial,
-				test,
-				winner
-			]
-		}
+		const timeline = [
+			hold,
+			known_trial,
+			video_trial,
+			test
+		];
+		timeline.push(winner);
 
 		var preload = [...preload_images]
-    	if (timeline.includes(instructions_loop)) {
-    		preload.push(...preload_instructions)
-    	}
     	preload.push('images/known.png', 'images/s_key.png', 'images/n_key.png')
 
 		jsPsych.init({
