@@ -233,74 +233,11 @@
 		}
 
 		window.addEventListener('keydown', endExperimentListener)
-
-		// synchronously fetch and parse stimuli csv
-		const xhr = new XMLHttpRequest();
-		xhr.open("GET", `stimuli.csv?v=${VERSION}`, false); // false = synchronous
-		xhr.send();
-
-		function csvToJson(csv) {
-			const [headerLine, ...rows] = csv.trim().split("\n");
-			const headers = headerLine.split(",");
-
-			return rows.map(row =>
-				Object.fromEntries(
-					row.split(",").map((v, i) => [headers[i], v])
-				)
-			);
-		}
-
-		const stimuli = {};
-		for (const stimulus of csvToJson(xhr.responseText)) {
-			if (!Object.hasOwn(stimuli, stimulus.id)) {
-				stimuli[stimulus.id] = [];
-			}
-			const trial_idx = stimulus.trial - 1;
-			if (stimuli[stimulus.id][trial_idx] != undefined) {
-				console.error(`Trial ${stimulus.trial} of ID ${stimulus.id} will be overwritten!`)
-			}
-			stimuli[stimulus.id][trial_idx] = {
-				"type": stimulus.type,
-				"explain": stimulus.explain > 0 ? true : false
-			}
-			const cards = [stimulus.card1, stimulus.card2, stimulus.card3];
-			if (cards.some(Boolean)) {
-				try {
-					const type = trialType(...cards);
-					if (type == stimulus.type) {
-						stimuli[stimulus.id][trial_idx]["cards"] = cards
-					} else {
-						console.error(`Trial ${trial_idx+1} of ID ${stimulus.id}: inferred type ${type} does not match specified type ${stimulus.type}.`);
-					}
-				} catch (err) {
-					console.error(`Failed processing cards for trial ${trial_idx+1} of ID ${stimulus.id}: ${err}`);
-				}
-			}
-		}
-		// check for, warn and fill any gaps in the trial sequences
-		for (const  [id, trials] of Object.entries(stimuli)) {
-			for (let i=0; i<trials.length; i++) {
-				if (trials[i] == undefined) {
-					let trial;
-					let j = i;
-					while (trial == undefined) {
-						j++;
-						trial = trials[j];
-					}
-					console.error(
-						`Trial ${i+1} of ID ${id} is undefined! Reusing trial ${j+1}.`
-					)
-					trials[i] = trial;
-				}
-			}
-		}
 		
 		var uid = urlParams.get('uid')
-    	while (true) {
-    		if (uid) {
-    			if (Object.hasOwn(stimuli, uid)) { break }
-    		}
-    		var uid = window.prompt('uid:', '')    		
+		while (true) {
+			if (uid) { break }
+			uid = window.prompt('uid:', '');
 		}
 
 		var mode = 'test'
@@ -323,7 +260,58 @@
 			stylesheet.innerHTML = '#holdscreen {background-color:#AAA;}'
 		}
 
-		var trials = stimuli[uid];
+		function shuffle(array) {
+			// Fisher-Yates
+			const shuffled = [...array];
+			for (let i = shuffled.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+			}
+			return shuffled;
+		}
+
+		var trials = [
+			{ type: "15", explain: true },  // Set 0-diferente
+			{ type: "-1", explain: true },  // No-Set 1-roto Color
+			{ type: "14", explain: true },  // Set 1-diferente Color
+			{ type: "-11", explain: true }  // No-Set 3-roto Forma
+		];
+
+		// bloque 1
+		trials.push(...shuffle([
+			{ type: "7", explain: false },  // Set 1-diferente Número
+			{ type: "2", explain: false },  // Set 3-diferente Textura
+			{ type: "0", explain: false },  // Set 4-diferente
+			{ type: "-13", explain: false },  // No-Set 3-roto Textura
+			{ type: "-8", explain: false }  // No-Set 1-roto Número
+		]));
+
+		// bloque 2
+		trials.push(...shuffle([
+			{ type: "14", explain: false },  // Set 1-diferente Color
+			{ type: "4", explain: false },  // Set 3-diferente Forma
+			{ type: "0", explain: false },  // Set 4-diferente
+			{ type: "-11", explain: false },  // No-Set 3-roto Forma
+			{ type: "-1", explain: false }  // No-Set 1-roto Color
+		]));
+
+		// bloque 3
+		trials.push(...shuffle([
+			{ type: "11", explain: false },  // Set 1-diferente Forma
+			{ type: "1", explain: false },  // Set 3-diferente Color
+			{ type: "0", explain: false },  // Set 4-diferente
+			{ type: "-14", explain: false },  // No-Set 3-roto Color
+			{ type: "-4", explain: false }  // No-Set 1-roto Forma
+		]));
+
+		// bloque 4
+		trials.push(...shuffle([
+			{ type: "13", explain: false },  // Set 1-diferente Textura
+			{ type: "8", explain: false },  // Set 3-diferente Número
+			{ type: "0", explain: false },  // Set 4-diferente
+			{ type: "-7", explain: false },  // No-Set 3-roto Número
+			{ type: "-2", explain: false }  // No-Set 1-roto Textura
+		]));
 
 		// randomly pick cards for each trial type
 		const allTrials = generateAllTrials();
