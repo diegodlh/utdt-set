@@ -5,3 +5,31 @@ html, body {
 .jspsych-content-wrapper {
   background: #FFF;
 }
+
+#jspsych-audio-button-response-btngroup {
+  display: flex !important;
+  align-items: stretch;
+}
+
+.jspsych-audio-button-response-button {
+  display: flex !important;
+  flex: 1;
+}
+
+.jol-choice {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.jol-choice span {
+  width: 100%;
+  white-space: normal;
+}
+
+.jol-choice img {
+  margin-top: auto;
+  width: 5vw;
+}
