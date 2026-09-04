@@ -455,7 +455,7 @@
 			button_html: `
 				<button class="jspsych-btn jol-choice">
 					<span>%choice%</span>
-					<img src="images/jol/%choice%.png">
+					<img src="images/jol/%choice%.png?v=${VERSION}">
 				</button>
 			`,
 			prompt: '<p>Antes de jugar, ¿Cuántas veces creés que vas a acertar si las cartas forman un SET o NO SET?</p>',
@@ -538,7 +538,7 @@
 			}
 		}
 
-		const why_audio_path = 'sounds/why.m4a';
+		const why_audio_path = `sounds/why.m4a?v=${VERSION}`;
 		const why_trial = {
 			type: 'survey-text',
 			questions: [
@@ -638,7 +638,7 @@
 		    	data.trial_num = trial_num,
 		    	data.ts_end = Date.now()
 		    },
-			preload_audio: preload_audio,
+			preload_audio: preload_audio.map(audio => `${audio}?v=${VERSION}`),
 		    preload_images: preload.map(img => `${img}?v=${VERSION}`),
 	      	on_interaction_data_update: function(data) {
     			data.ts_start = Date.now(),

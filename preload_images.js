@@ -48,5 +48,10 @@ var preload_images = [
 'images/squiggle_striped_blue.svg',
 'images/squiggle_striped_green.svg',
 'images/squiggle_striped_red.svg',
-'images/striped.png'
+'images/striped.png',
+'images/jol/Algunas veces.png',
+'images/jol/Casi nunca.png',
+'images/jol/Casi siempre.png',
+'images/jol/Muchas veces.png',
+'images/jol/Pocas veces.png'
 ]
