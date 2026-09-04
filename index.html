@@ -538,7 +538,7 @@
 			}
 		}
 
-		const why_audio_path = `sounds/why.m4a?v=${VERSION}`;
+		const why_audio_path = 'sounds/why.m4a';
 		const why_trial = {
 			type: 'survey-text',
 			questions: [
@@ -559,7 +559,9 @@
 				textarea.disabled = true;
 				button.disabled = true;
 				
-				const audio = jsPsych.pluginAPI.getAudioBuffer(why_audio_path);
+				const audio = jsPsych.pluginAPI.getAudioBuffer(
+					why_audio_path + `?v=${VERSION}`
+				);
 				audio.addEventListener('ended', () => {
 					textarea.disabled = false;
 					textarea.focus();
