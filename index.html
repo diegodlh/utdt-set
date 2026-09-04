@@ -11,6 +11,7 @@
         <script src="jspsych-6.0.4/plugins/jspsych-audio-keyboard-response.js?v=__VERSION__"></script>
 		<script src="jspsych-6.0.4/plugins/jspsych-audio-button-response.js?v=__VERSION__"></script>
 		<script src="jspsych-6.0.4/plugins/jspsych-call-function.js?v=__VERSION__"></script>
+		<script src="jspsych-6.0.4/plugins/jspsych-survey-text.js?v=__VERSION__"></script>
         <script src="auxiliary.js?v=__VERSION__"></script>
         <script src="preload_images.js?v=__VERSION__"></script>
         <link href="jspsych-6.0.4/css/jspsych.css?v=__VERSION__" rel="stylesheet" type="text/css"></link>
@@ -239,6 +240,7 @@
 			if (uid) { break }
 			uid = window.prompt('uid:', '');
 		}
+		const choice_group = uid.toLowerCase().endsWith('c');
 
 		var mode = 'test'
 
@@ -536,6 +538,45 @@
 			}
 		}
 
+		const why_audio_path = 'sounds/why.m4a';
+		const why_trial = {
+			type: 'survey-text',
+			questions: [
+				{
+					prompt: '<p>¿Por qué elegiste aprender de esta manera?</p>',
+					// required: true,  // not supported in jspsych 6.0.4
+					rows: 10
+				}
+			],
+			button_label: "CONTINUAR",	
+			on_load: () => {
+				const textarea = document.querySelector(
+					".jspsych-survey-text-question textarea"
+				);
+				const button = document.querySelector(
+					"button.jspsych-survey-text"
+				);
+				textarea.disabled = true;
+				button.disabled = true;
+				
+				const audio = jsPsych.pluginAPI.getAudioBuffer(why_audio_path);
+				audio.addEventListener('ended', () => {
+					textarea.disabled = false;
+					textarea.focus();
+					textarea.addEventListener('input', () => {
+						if (textarea.value.trim() == '') {
+							button.disabled = true;
+						} else {
+							button.disabled = false;
+						}
+					});
+				});
+
+				audio.play();
+			},
+			data: {}
+		};
+		
 		var winner = {
 			type: 'html-keyboard-response',
 			stimulus: function() {
@@ -579,6 +620,12 @@
 			jol2_trial,
 			test
 		];
+
+		const preload_audio = []
+		if (choice_group) {
+			timeline.push(why_trial);
+			preload_audio.push(why_audio_path);
+		}
 		timeline.push(winner);
 
 		var preload = [...preload_images]
@@ -597,6 +644,7 @@
 		    	data.trial_num = trial_num,
 		    	data.ts_end = Date.now()
 		    },
+			preload_audio: preload_audio,
 		    preload_images: preload.map(img => `${img}?v=${VERSION}`),
 	      	on_interaction_data_update: function(data) {
     			data.ts_start = Date.now(),
