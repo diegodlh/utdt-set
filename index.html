@@ -518,7 +518,15 @@
 				trial.data.correct = jsPsych.data.getLastTrialData().values()[0].correct
 				trial.data.explain = jsPsych.data.getLastTrialData().values()[0].explain
 			},
-			on_load: function() {jsPsych.data.getLastTrialData().values()[0].correct ? audio_correct.play() : audio_wrong.play()}
+			on_load: function() {
+				if (jsPsych.data.getLastTrialData().values()[0].correct) {
+					audio_correct.currentTime = 0;
+					audio_correct.play();
+				} else {
+					audio_wrong.currentTime = 0;
+					audio_wrong.play();
+				}
+			}
 		}
 
 		var test = {
