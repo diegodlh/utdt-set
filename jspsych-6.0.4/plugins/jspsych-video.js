@@ -173,7 +173,9 @@ jsPsych.plugins.video = (function() {
     display_element.innerHTML = video_html;
 
     // setup audio after video stimulus
-    var audio = new Audio(trial.audio_after);
+    if (trial.audio_after) {
+      var audio = new Audio(trial.audio_after);
+    }
 
     var views = 0;
     var listener_backward;
@@ -184,8 +186,11 @@ jsPsych.plugins.video = (function() {
       } else {
         document.getElementById('video-next').style.visibility = 'visible';
         document.getElementById('video-back').style.visibility = 'visible';
+
         // start audio
-        audio.play();
+        if (audio) {
+          audio.play();
+        }
 
         jsPsych.pluginAPI.getKeyboardResponse({
           callback_function: end_trial,
@@ -204,8 +209,11 @@ jsPsych.plugins.video = (function() {
 
     var replay = function() {
       document.getElementById('video-back').style.visibility = 'hidden';
+
       // stop the audio file if it is playing
-      audio.pause();
+      if (audio) {
+        audio.pause();
+      }
 
       jsPsych.pluginAPI.cancelKeyboardResponse(listener_backward);
       window.clearTimeout(replay_timer);
@@ -239,7 +247,9 @@ jsPsych.plugins.video = (function() {
       jsPsych.pluginAPI.clearAllTimeouts();
 
       // stop the audio file if it is playing
-      audio.pause();
+      if (audio) {
+        audio.pause();
+      }
       
       // gather the data to store for the trial
       var trial_data = {
