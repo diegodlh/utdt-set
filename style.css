@@ -6,12 +6,12 @@ html, body {
   background: #FFF;
 }
 
-#jspsych-audio-button-response-btngroup {
+#jspsych-html-button-response-btngroup {
   display: flex !important;
   align-items: stretch;
 }
 
-.jspsych-audio-button-response-button {
+.jspsych-html-button-response-button {
   display: flex !important;
   flex: 1;
 }
