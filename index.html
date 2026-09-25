@@ -153,8 +153,6 @@
 			event.returnValue = '';
 		}
 
-		window.addEventListener('beforeunload', beforeunload)
-
 		var saveData = function() {
 			function saveLocal(filename, csvdata) {
 				localStorage.setItem(filename, csvdata)
@@ -398,6 +396,9 @@
 				document.getElementById("holdscreen").style.fontSize = (
 					100 / (uid_string.length + 1) / 0.6 + "vw"
 				);
+			},
+			on_finish: function() {
+				window.addEventListener('beforeunload', beforeunload)
 			},
 			data: {}
 		}
