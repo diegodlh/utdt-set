@@ -179,8 +179,20 @@
 			const data = {
 				"data": jsPsych.data.get().ignore('stimulus').values(),
 				"intdata": jsPsych.data.getInteractionData().values()
+			};
+
+			const filename = 'data_' + basename + '.json';
+			const jsonData = JSON.stringify(data, null, 2);
+			saveLocal(filename, jsonData);
+
+			const wrapper = document.querySelector(
+				"div.jspsych-content-wrapper"
+			);
+			if (wrapper) {
+				wrapper.addEventListener("click", () => {
+					saveLocal(filename, jsonData);
+				});
 			}
-			saveLocal('data_' + basename + '.json', JSON.stringify(data, null, 2));
 		};
 
 		var keydown = function(keystring) {
