@@ -181,7 +181,7 @@ jsPsych.plugins.video = (function() {
     var listener_backward;
     var replay_timer;
     display_element.querySelector('#jspsych-video-player').onended = function(){
-      if (views == trial.max_views) {
+      if (views >= trial.max_views) {
         end_trial();
       } else {
         document.getElementById('video-next').style.visibility = 'visible';
@@ -223,10 +223,9 @@ jsPsych.plugins.video = (function() {
 
     // event handler to set timeout to end trial if video is stopped
     display_element.querySelector('#jspsych-video-player').onplay = function(){
-      if (display_element.querySelector('#jspsych-video-player').currentTime == 0) {
-        views += 1;
-        view_history.push((new Date()).getTime());
-      };
+      // assume all playbacks start from 0
+      views += 1;
+      view_history.push((new Date()).getTime());
       if(trial.stop !== null){
         if(trial.start == null){
           trial.start = 0;
