@@ -155,7 +155,19 @@
 
 		var saveData = function() {
 			function saveLocal(filename, csvdata) {
-				localStorage.setItem(filename, csvdata)
+				try {
+					try {
+						localStorage.setItem(filename, csvdata);
+					} catch (error) {
+						if (error.name === 'QuotaExceededError') {
+							console.log("Wiping local storage...")
+							localStorage.clear();
+						}
+						localStorage.setItem(filename, csvdata);
+					}					
+				} catch {
+					console.error("Could not save to local storage.");
+				}
 				var blob = new Blob(
 					[csvdata],
 					// {type: 'text/csv'}
